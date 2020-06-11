@@ -185,16 +185,9 @@ Let us examine three areas to get a feel of how far you can go in analyzing CSV 
 ### Pivot
 Pivoting a table is a frequently used function in data analyses. It provides a more compact view of the data by transforming column values to new columns. The new view allows for examining related values side-by-side. The technique is often used to visualize the output of aggregation with multiple grouping.
 
-I put some  wrapper function around when most [wide-spread pivot implementation](https://code.kx.com/q/kb/pivoting-tables/#a-very-general-pivot-function-and-an-example) into `utils/pivots.q`
+I put some  wrapper function around when most [wide-spread pivot implementation](https://code.kx.com/q/kb/pivoting-tables/#a-very-general-pivot-function-and-an-example) into `utils/pivots.q`. All we need is to load library `pivot.q` and prepend `.pvt.pivotSingle`. It requires a keyed table, typically the result of an aggregation with multiple groups. The pivot column is the last key column. See how pivotting converts a narrow, hard to digest table to a square shaped format that nicely fits the console.
 
-```
-$ qcsv 'system "l utils/pivot.q";
-.pvt.pivotSingle select sum Population by Region, Country from .csv.read `data.csv'
-```
-
-Below we can see how pivoting helps better reviewing the aggregations.
-
-The example also reveals the support of temporal data.
+![pivot](pic/tty-small.gif)
 
 ### Array columns
 Nothing prevents you technically to put a list of values into a cell of a CSV. You just need to use a separator other than a comma, e.g. whitespace or semicolon. Unlike ANSI SQL, kdb+ can handle array columns.
@@ -266,8 +259,10 @@ If we pass list of lists to both sides of the `@` operator then we need the `eac
 ```bash
 $ qcsv $'
 t:update "I"$" " vs\' A, "I"$" " vs\' IDX from .csv.read `data.csv;
-update sum_a_of: sum each A@\'IDX from'
+update sum_A_of: sum each A@\'IDX from t'
 ```
+
+![operations on array columns](pic/array.png)
 
 I split the expression to multiple lines for readability, but from the shell's perspective it is still a single command.
 
@@ -322,11 +317,12 @@ Character `h` at the end of the integer list in column `taskID` denoted the shor
 To get the ratio, we need to work with elapsed times
 
 ```
-q) select requestID, rate: elapsed % end-start from
+q) select requestID, rate: duration % end-start from
      wj1[(m.start;m.end); `slaveID`start; m;
-       (`slaveID`start xasc; (sum; `duration))]
+       (`slaveID`start xasc s; (sum; `duration))]
 ```
 
+![advanced join operation](pic/windowjoin.png)
 
 ## Performance
 Let us compare the performance of executing a simple aggregation on publicly available CSV also used in benchmarking the `xsv` package. The file is 145 MByte large and contains almost 32 million lines.
