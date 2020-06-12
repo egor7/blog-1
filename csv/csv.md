@@ -1,6 +1,8 @@
 # Powerful CSV processing with kdb+
 
-Comma-separated text files (CSV) are the most fundamental format for data processing. All programming languages and software that support working with relational data, also provide some level of CSV handling. You can persist and process data without installing a DBMS. It is a light-way form of storing, processing and sharing data.
+Comma-separated text files (CSV) are the most fundamental format for data processing. All programming languages and software that support working with relational data, also provide some level of CSV handling. You can persist and process data without installing a database management system. It is a light-way form of storing, processing and sharing data.
+
+The CSV format predates personal computers and has been one of the most common data exchange format for almost 50 years. CSV files will remain with us in the future. Working with this format efficiently is a core requirement of a productive developer, data engineer, DevOps person, etc.. 
 
 In this article I review available tools to process CSV files and then show how kdb+ raises CSV processing to a new level both in performance and in simplicity.
 
