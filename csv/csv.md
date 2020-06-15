@@ -49,7 +49,7 @@ The library also supports selecting column, filtering, sorting and joining CSV. 
 
 
 ## Type Inference
-CSV is a text file, there is no type information associated with the columns. Strings can be converted to a type based on its value. If all values of a column matches the pattern `YYYY.MM.DD` then we can conclude that the column stores date. But how shall we treat the literal 100000? Is it an integer, or a time 10am? Maybe the upstream process only supported digits hence the time separators are missing? In real life, information about the upstream is not always available and you need to reverse engineering the data. If all values of the column matches `HHMMSS` string then we **can** conclude with high confidence that the column stores time values. We can follow two approaches to make a decision.
+CSV is a text file, there is no type information associated with the columns. Strings can be converted to a type based on its value. If all values of a column matches the pattern `YYYY.MM.DD` then we can conclude that the column stores date. But how shall we treat the literal 100000? Is it an integer, or a time 10am? Maybe the upstream process only supports digits hence the time separators are missing? In real life, information about the upstream is not always available and you need to reverse engineering the data. If all values of the column matches `HHMMSS` string then we **can** conclude with high confidence that the column stores time values. We can follow two approaches to make a decision.
 
 First, we can be strict, i.e. we predefine the pattern that any type needs to match. The patterns are not overlapping. If time is defined as `HH:MM:SS` and integers as `[1-9][0-9]*` then 100000 is an integer.
 
@@ -73,7 +73,7 @@ q) `output.csv 0:"|"0: t
 To import a CSV `data.csv`, you need to specify the column types and the separator. The following command assumes that the column names are in the first row.
 
 ```
-q) ("JFDS* I";enlist",") 0:hsym `output.csv
+q) ("JFDS* I";enlist",") 0:hsym `data.csv
 ```
 
 The type encoding is available on the [kdb+ reference card](https://code.kx.com/q/ref/#datatypes), `I` stands for integer, `J` for long, `D` for date, etc. Use white spaces to ignore columns. Character `*` denotes string.
@@ -91,7 +91,7 @@ q) .csv.read `data.csv
 
 ![displaying CSV content by .csv.read](pic/csvread.png)
 
-Scripts `csvguess.q` allows saving a meta-information about the columns. Developers can review and adjust the type column and use the meta-data in production to load CSV with proper type. The two scripts have different users. Data scientists prefer `csvutil.q` for their ad hoc analyses. When IT is setting up a kdb+ CSV feed then they use assisted meta-data export and import feature `csvguess.q`. The type hints provides a less error prone solution than manually entering types for all columns.
+Scripts `csvguess.q` allows saving a meta-information about the columns. Developers can review and adjust the type column and use the meta-data in production to load CSV with proper type. The two scripts have different users. Data scientists prefer `csvutil.q` for their ad hoc analyses. When IT is setting up a kdb+ CSV feed then they use assisted meta-data export and import feature of `csvguess.q`. The type hints provides a less error prone solution than manually entering types for all columns.
 
 ### Type conversion
 
@@ -110,9 +110,9 @@ The column meta-data table is a bit similar to `csvstat` output.
 
 ![CSV meta-information by csvinfo](pic/csvinfo.png)
 
-Each row belongs to a column and each field stores some useful information about the column, like name (`c`), inferred type (`t`), max width (`mw`), etc. Field `gr` short for granularity is particularly interesting as it gives hint how well the column values compresses and if it should be stored as enumeration (symbol in kdb+ parlance) rather than as string.
+Each row belongs to a column and each field stores some useful information about the column, like name (`c`), inferred type (`t`), max width (`mw`), etc. Field `gr` short for *granularity* is particularly interesting as it gives hint how well the column values compresses and if it should be stored as enumeration (symbol in kdb+ parlance) rather than as string.
 
-You can control the number of lines to be examined for type inference by variable `READLINES`. The default value is 5555. The smaller this number the more chance of an inference rule to be accidental. For example in sample table (that was also used in CSVKit tutorial) column `fips` matches the patter `HMMSS` for the first 916 rows, so we could infer time as type. The patter matching breaks from line 917 with values like `31067`. To disable partial file-based type inference, just change `READLINES`.
+You can control the number of lines to be examined for type inference by variable `READLINES`. The default value is 5555. The smaller this number the more chance of an inference rule to be coincidental. For example in sample table (that was also used in CSVKit tutorial) column `fips` matches the patter `HMMSS` for the first 916 rows, so we could infer time as type. The patter matching breaks from line 917 with values like `31067`. To disable partial file-based type inference, just change `READLINES`.
 
 ```
 q) .csv.READLINES: count read0 `data.csv
