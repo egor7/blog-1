@@ -219,7 +219,7 @@ q) vs[" "] each ("10 31 -42"; "104 105 107")
 "104" "105" "107"
 ```
 
-or more elegantly with operator `each both` (denoted by ') if the separator is a single character
+or more elegantly with operator `each both` (denoted by `'`) if the separator is a single character
 
 ```
 q) " " vs' ("10 31 -42"; "104 105 107")
