@@ -11,17 +11,17 @@ Linux shells, like Bash, support array. You can read a CSV line-by-line and stor
 
 General text processing tools like [awk](https://en.wikipedia.org/wiki/AWK) and [sed](https://en.wikipedia.org/wiki/Sed) scripts may result in shorter and simpler code. Commands like [cut](https://en.wikipedia.org/wiki/Cut_(Unix)), [sort](https://en.wikipedia.org/wiki/Sort_(Unix)), [uniq](https://en.wikipedia.org/wiki/Uniq) and [paste](https://en.wikipedia.org/wiki/Paste_(Unix)) further simplifies CSV processing. You can specify the separator and **refer to fields by positions**.
 
-The world is constantly changing. So do CSV files. Position-based reference breaks if new column is added ahead of the referred column or columns are shuffled e.g. to move related columns next to each other. The problem manifests silently, maybe your scripts run fine, you just use a different column in your calculation. If you don't have a regression testing framework to safeguard your codebase, then the end-user (or your competitor) might discover the problem. This can be embarrassing.
+The world is constantly changing. So do CSV files. Position-based reference breaks if new a column is added ahead of the referred column or columns are shuffled e.g. to move related columns next to each other. The problem manifests silently, maybe your scripts run fine, you just use a different column in your calculation. If you don't have a regression testing framework to safeguard your codebase, then the end-user (or your competitor) might discover the problem. This can be embarrassing.
 
 Position based reference creates fragile code. Processing CSV by these Linux commands is great for prototyping and to do a quick analyses but you bump into the limits once your codebase starts increasing or you share scripts with other colleagues. No wonder that in SQL the position based column reference is limited and discouraged.
 
-You can *refer to a column by name*. The column names are stored in the first row of the CSV. Reference by name is sensitive to column renaming but probably this happens less frequently than adding or reshuffling columns.
+You can **refer to a column by name**. The column names are stored in the first row of the CSV. Reference by name is sensitive to column renaming but probably this happens less frequently than adding or reshuffling columns.
 
 The huge benefit of Linux command line tools is that no installation is required. Your shell script will likely run on other's Linux systems. Get familiar with Linux tools but refrain from using them in complex tasks. Remember that the separator is specified by `-t` command line option for [sort](https://en.wikipedia.org/wiki/Sort_(Unix)) and `-d` for the other commands, [cut](https://en.wikipedia.org/wiki/Cut_(Unix)), [paste](https://en.wikipedia.org/wiki/Paste_(Unix)).
 
 ## CSVKit
 
-There are many open source libraries on Github with the aim of CSV support. Python library [CSVKit](https://csvkit.readthedocs.io/en/latest/#) is one of the most popular. It offers a more robust solution than native Linux commands. Most importantly, CSVKit commands allow column name based reference.
+There are many open source libraries on Github with the aim of CSV support. Python library [CSVKit](https://csvkit.readthedocs.io/en/latest/#) is one of the most popular tools. It offers a more robust solution than native Linux commands. Most importantly, CSVKit commands allow reference by column name.
 
 Also they are better in handling the first column separately than the general-purpose text tools. Linux command `sort` treats the first row as normal row and can place it in the middle of the output. Similarly `cat` is not skipping the first rows when you concatenate multiple CSV files. Commands `csvsort` and `csvstack` handle first rows as properly.
 
