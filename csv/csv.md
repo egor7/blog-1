@@ -187,7 +187,7 @@ Let us examine three areas to get a feel of how far you can go in analyzing CSV 
 ### Pivot
 Pivoting a table is a frequently used function in data analyses. It provides a more compact view of the data by transforming column values to new columns. The new view allows for examining related values side-by-side. The technique is often used to visualize the output of aggregation with multiple grouping.
 
-I put some  wrapper function around when most [wide-spread pivot implementation](https://code.kx.com/q/kb/pivoting-tables/#a-very-general-pivot-function-and-an-example) into `utils/pivots.q`. All we need is to load library `pivot.q` and prepend `.pvt.pivotSingle`. It requires a [keyed table] (https://code.kx.com/q4m3/8_Tables/#84-primary-keys-and-keyed-tables) , typically the result of an aggregation with multiple group bys. The pivot column is the last key column. See how pivotting converts a narrow, hard to digest table to a square shaped format that nicely fits the console.
+I put some  wrapper function around when most [wide-spread pivot implementation](https://code.kx.com/q/kb/pivoting-tables/#a-very-general-pivot-function-and-an-example) into `utils/pivots.q`. All we need is to load library `pivot.q` and prepend `.pvt.pivotSingle`. It requires a [keyed table](https://code.kx.com/q4m3/8_Tables/#84-primary-keys-and-keyed-tables) , typically the result of an aggregation with multiple group bys. The pivot column is the last key column. See how pivotting converts a narrow, hard to digest table to a square shaped format that nicely fits the console.
 
 ![pivot](pic/tty-small.gif)
 
