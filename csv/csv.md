@@ -2,7 +2,7 @@
 
 Comma-separated text files (CSV) are the most fundamental format for data processing. All programming languages and software that support working with relational data, also provide some level of CSV handling. You can persist and process data without installing a database management system. It is a light-way form of storing, processing and sharing data.
 
-The CSV format predates personal computers and has been one of the most common data exchange format for almost 50 years. CSV files will remain with us in the future. Working with this format efficiently is a core requirement of a productive developer, data engineer, DevOps person, etc.. 
+The CSV format predates personal computers and has been one of the most common data exchange format for almost 50 years. CSV files will remain with us in the future. Working with this format efficiently is a core requirement of a productive developer, data engineer, DevOps person, etc..
 
 In this article I review available tools to process CSV files and then show how kdb+ raises CSV processing to a new level both in performance and in simplicity.
 
@@ -43,7 +43,7 @@ To perform aggregations, filtering and grouping, you can use the generic command
 
 ## xsv
 
-Some CSVKit commands are slow because they load the entire file into the memory and creates an in-memory database. Rust developers reimplemented several traditional tools like `cat`, `ls`, `grep` and `find` and tools like `bat`, `exa`, `ripgrep` and `fd` were born. No wonder that they also created a performant tool for CSV processing, library [xsv](https://github.com/BurntSushi/xsv).
+Some CSVKit commands are slow because they load the entire file into the memory and creates an in-memory database. Rust developers reimplemented several traditional tools like `cat`, `ls`, `grep` and `find` and tools like [bat](https://github.com/sharkdp/bat), [exa](https://github.com/ogham/exa), [ripgrep](https://github.com/BurntSushi/ripgrep) and [fd](https://github.com/sharkdp/fd) were born. No wonder that they also created a performant tool for CSV processing, library [xsv](https://github.com/BurntSushi/xsv).
 
 The library also supports selecting column, filtering, sorting and joining CSV. An index can be added to CSV files that are frequently processed to speed up operations. It is an elegant and lightweight step towards DBMS.
 
