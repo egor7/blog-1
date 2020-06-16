@@ -364,7 +364,7 @@ The run times in seconds are displayed below. The second row corresponds to the 
 | **CSVKit** | **textql** | **csvq** | **kdb+** |
 | --- | --- | --- | --- |
 | 220 | 23 | 13 | 2 |
-| KILLED | 102 | OUT OF MEM | 6 |
+| OUT OF MEM | 102 | OUT OF MEM | 6 |
 
 kdb+ is famous for its stunning speed. Benchmarks so far focused on data that resides either in-memory or on disk using its proprietary format. Supporting CSV is a nice-to-have feature of the language. However, the extreme optimization, the support of vector operations and the inherent parallelization pays off, kdb+ significantly outperforms tools that are build for CSV analyses. The execution times directly translate to productivity. How much it cost you if the query returns in almost 4 minutes vs. it returns in 2 seconds? What do your developers do when their workflow is constantly interrupted by minutes-long wait phases.
 
