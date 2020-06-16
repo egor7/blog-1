@@ -118,7 +118,7 @@ You can control the number of lines to be examined for type inference by variabl
 q) .csv.READLINES: count read0 `data.csv
 ```
 
-## kdb+-based one-liners
+## kdb+ based one-liners
 
 Let us wrap the q interpreter and the load of `csvutil.q` into a simple shell function.
 
@@ -368,7 +368,7 @@ The run times in seconds are displayed below. The second row corresponds to the 
 
 kdb+ is famous for its stunning speed. Benchmarks so far focused on data that resides either in-memory or on disk using its proprietary format. Supporting CSV is a nice-to-have feature of the language. However, the extreme optimization, the support of vector operations and the inherent parallelization pays off, kdb+ significantly outperforms tools that are build for CSV analyses. The execution times directly translate to productivity. How much it cost you if the query returns in almost 4 minutes vs. it returns in 2 seconds? What do your developers do when their workflow is constantly interrupted by minutes-long wait phases.
 
-The test run on a `n1-standard-4` GCP virtual machine. The run times of the kdb+-based solution would further drop with machines of more cores, as kdb+ 4 could better make use of the [multithreaded primitives](https://code.kx.com/q/kb/mt-primitives/).
+The test run on a `n1-standard-4` GCP virtual machine. The run times of the kdb+ based solution would further drop with machines of more cores, as kdb+ 4 could better make use of the [multithreaded primitives](https://code.kx.com/q/kb/mt-primitives/).
 
 ## Conclusion
 There are many tools out there to process CSV files. kdb+ has an excellent open source library `csvutil.q`/`csvguess.q` that have sophisticated type inference engine. Once you converted the CSV into a kdb+ in-memory table, you can easily cope with problems the other tools cannot handle or requires unnecessary complexity. You can express complex logic in a readable way that is easy to maintain, executes fast simply by wrapping the q interpreter that loads the library into a shell function.
