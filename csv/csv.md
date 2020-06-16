@@ -341,7 +341,13 @@ The kdb+ query is simple.
 $ qcsv '10 sublist `Population xdesc select sum Population by Region from .csv.basicread `worldcitiespop.csv'
 ```
 
-The `csvsql` command requires a bit more typing
+The aggregation requires columns `Population` and `Region` only so we can speed up the query by omitting type conversion of the unused columns.
+
+```
+$ qcsv '10 sublist `Population xdesc select sum Population by Region from .csv.data[`worldcitiespop.csv; .csv.infoonly[`worldcitiespop.csv; `Population`Region]]
+```
+
+The `csvsql` is quite similar
 
 ```
 $ csvsql --query "select Region, SUM(Population) AS Population FROM worldcitiespop GROUP BY Region ORDER BY Population DESC LIMIT 10" worldcitiespop.csv
@@ -349,15 +355,20 @@ $ csvsql --query "select Region, SUM(Population) AS Population FROM worldcitiesp
 
 There are several other open source tools that were built to run SQL statements on CSV files. I also evaluated two packages that were written in GO.
 
-The run times in seconds are displayed below
+```
+$ textql -header -sql "select Region, SUM(Population) AS Population FROM worldcitiespop GROUP BY Region ORDER BY Population DESC LIMIT 10" worldcitiespop.csv
+```
+
+The run times in seconds are displayed below. The second row corresponds to the experiment with the same CSV bloated by repeating its content five times.
 
 | **CSVKit** | **textql** | **csvq** | **kdb+** |
 | --- | --- | --- | --- |
-| 220 | 23 | 13 | 3 |
+| 220 | 23 | 13 | 2 |
+| KILLED | 102 | OUT OF MEM | 6 |
 
-kdb+ is famous for its stunning speed. Benchmarks so far focused on data that resides either in-memory or on disk using its proprietary format. Supporting CSV is a nice-to-have feature of the language. However, the extreme optimization, the support of vector operations and the inherent parallelization pays off, kdb+ significantly outperforms tools that are build for CSV analyses. The execution times directly translate to productivity. How much it cost you if the query returns in almost 4 minutes vs. it returns in 3 seconds? What do your developers do when their workflow is constantly interrupted by minutes-long wait phases.
+kdb+ is famous for its stunning speed. Benchmarks so far focused on data that resides either in-memory or on disk using its proprietary format. Supporting CSV is a nice-to-have feature of the language. However, the extreme optimization, the support of vector operations and the inherent parallelization pays off, kdb+ significantly outperforms tools that are build for CSV analyses. The execution times directly translate to productivity. How much it cost you if the query returns in almost 4 minutes vs. it returns in 2 seconds? What do your developers do when their workflow is constantly interrupted by minutes-long wait phases.
 
-The test run on a `n1-standard-4` GCP VM. The run times of the kdb+-based solution would further drop with machines of more cores, as kdb+ 4 could better make use of the [multithreaded primitives](https://code.kx.com/q/kb/mt-primitives/).
+The test run on a `n1-standard-4` GCP virtual machine. The run times of the kdb+-based solution would further drop with machines of more cores, as kdb+ 4 could better make use of the [multithreaded primitives](https://code.kx.com/q/kb/mt-primitives/).
 
 ## Conclusion
-There are many tools out there to process CSV files. kdb+ has an excellent open source library `csvutil.q`/`csvguess.q` that have sophisticated type inference engine. Once you converted the CSV into a kdb+ in-memory table, you can easily cope with problems the other tools cannot handle or only with unnecessary complexity. You can express complex logic in a readable way that is easy to maintain by wrapping the q interpreter that loads the library into a shell function.
+There are many tools out there to process CSV files. kdb+ has an excellent open source library `csvutil.q`/`csvguess.q` that have sophisticated type inference engine. Once you converted the CSV into a kdb+ in-memory table, you can easily cope with problems the other tools cannot handle or requires unnecessary complexity. You can express complex logic in a readable way that is easy to maintain, executes fast simply by wrapping the q interpreter that loads the library into a shell function.
