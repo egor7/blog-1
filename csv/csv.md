@@ -231,7 +231,7 @@ It is not a problem if the list of string is given as a column of a table. Let u
 q) update "I"$" " vs' A from .csv.read `data.csv
 ```
 
-Just to illustrate the power of the q language, let us assume that `data.csv` contains another array column called `IDX` and contains indices. For each row we need to calculate the sum of array column `A` restricted to the indices specified by `IDX`.
+Just to illustrate the power of the q language, let us assume that `data.csv` contains another array column called `IDX` and contains indices. For each row we need to calculate the sum of array column `A` restricted to the indices specified by `IDX`. Let me delve inside indexing a little bit. 
 
 In kdb+ you can index a list the same way as you do in other programing language
 
@@ -248,7 +248,7 @@ q) l[2 1]
 6 1
 ```
 
-The square brackets are just syntactic sugar, you can also use the `@` operator
+The square brackets are just syntactic sugar, you can also use the `@` operator with infix notation
 
 ```
 q) l @ 2 1
