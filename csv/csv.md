@@ -329,33 +329,33 @@ q) select requestID, rate: duration % end-start from
 ## Performance
 Let us compare the performance of executing a simple aggregation on publicly available CSV also used in benchmarking the `xsv` package. The file is 145 MByte large and contains almost 32 million lines.
 
-```
-curl -LO https://burntsushi.net/stuff/worldcitiespop.csv
+```bash
+$ curl -LO https://burntsushi.net/stuff/worldcitiespop.csv
 ```
 
 We would like to see the top 10 regions by population. We need to sum the population of the cities of each region. Package xsv does not support aggregation thus it is out of the game.
 
 The kdb+ query is simple.
 
-```
+```bash
 $ qcsv '10 sublist `Population xdesc select sum Population by Region from .csv.basicread `worldcitiespop.csv'
 ```
 
 The aggregation requires columns `Population` and `Region` only so we can speed up the query by omitting type conversion of the unused columns.
 
-```
+```bash
 $ qcsv '10 sublist `Population xdesc select sum Population by Region from .csv.data[`worldcitiespop.csv; .csv.infoonly[`worldcitiespop.csv; `Population`Region]]
 ```
 
 The `csvsql` is quite similar
 
-```
+```bash
 $ csvsql --query "select Region, SUM(Population) AS Population FROM worldcitiespop GROUP BY Region ORDER BY Population DESC LIMIT 10" worldcitiespop.csv
 ```
 
 There are several other open source tools that were built to run SQL statements on CSV files. I also evaluated two packages that were written in GO.
 
-```
+```bash
 $ textql -header -sql "select Region, SUM(Population) AS Population FROM worldcitiespop GROUP BY Region ORDER BY Population DESC LIMIT 10" worldcitiespop.csv
 ```
 
