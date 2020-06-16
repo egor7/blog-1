@@ -278,7 +278,7 @@ For time series there is another type of joins that are frequently used. This is
 Let me demonstrate the usage of window join in a real-life scenario to profile distributed processes. Our master process sends request to slave processes. Each request results in multiple tasks. We store the `start` and `end` times of the requests and the `start` times and `duration` of the tasks. We would like to see the ratio of times the slave devoted to each request. Due to network delay start time of a task happens after the start time of a request. An example of the master's data is below.
 
 | requestID | slaveID | start | end |
-| --- | --- | --- | --- |
+| ---: | ---: | ---: | ---: |
 RQ1|SL1|12:31|12:52|
 RQ2|SL2|12:31|12:50|
 RQ3|SL1|12:54|12:59|
@@ -287,8 +287,8 @@ RQ5|SL1|13:10|13:13|
 
 And merged slaves data is
 
-| slaveI D| taskID | start | duration |
-| --- | --- | --- | --- |
+| slaveID | taskID | start | duration |
+| ---: | ---: | ---: | ---: |
 |SL1|1|12:32|1|
 |SL1|2|12:35|2|
 |SL1|3|12:37|10|
@@ -361,8 +361,8 @@ $ textql -header -sql "select Region, SUM(Population) AS Population FROM worldci
 
 The run times in seconds are displayed below. The second row corresponds to the experiment with the same CSV bloated by repeating its content five times.
 
-| **CSVKit** | **textql** | **csvq** | **kdb+** |
-| --- | --- | --- | --- |
+| CSVKit | textql | csvq | kdb+ |
+| ---: | ---: | ---: | ---: |
 | 220 | 23 | 13 | 2 |
 | OUT OF MEM | 102 | OUT OF MEM | 6 |
 
