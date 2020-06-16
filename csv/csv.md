@@ -273,9 +273,9 @@ The each-both operator (`'`) needs to be escaped and we need to use ANSI-C quoti
 ### Join
 Joining two CSV files already supported by Linux command `join`. Command `csvjoin` goes further and support all types of SQL joins inner, left, right and outer. kdb+ also supports these classic join operations.
 
-For time series there is another type of joins that are frequently used. These is called asof and its generalization window join. If you have two streams of data and the times are different then asof join can merge the two streams.
+For time series there is another type of joins that are frequently used. This is called asof and its generalization window join. If you have two streams of data and the times are different then asof join can merge the two streams.
 
-Let me demonstrate the usage of window join in a real-life scenario to profile distributed processes. Our master process sends request to slave processes. Each requests results in multiple tasks. We store the `start` and `end` times of the requests and the `start` and `end` times of the tasks. We would like to see the ratio of times the slave devoted to each request. Due to network delay start time of a task happens after the start time of a request. An example of the master's data is below.
+Let me demonstrate the usage of window join in a real-life scenario to profile distributed processes. Our master process sends request to slave processes. Each request results in multiple tasks. We store the `start` and `end` times of the requests and the `start` times and `duration` of the tasks. We would like to see the ratio of times the slave devoted to each request. Due to network delay start time of a task happens after the start time of a request. An example of the master's data is below.
 
 | requestID | slaveID | start | end |
 | --- | --- | --- | --- |
@@ -314,7 +314,7 @@ requestID slaveID start end   taskID
 5         sl1     13:10 13:13 ,6h
 ```
 
-Character `h` at the end of the integer list in column `taskID` denoted the short modifier, i.e. the integer is stored in one byte. Function `.csv.info` try to save memory and use the integer and floating point representation that requires the least space and preserves all information.
+Character `h` at the end of the integer list in column `taskID` denotes the short modifier, i.e. the integer is stored in one byte. Function `.csv.info` try to save memory and use the integer and floating point representation that requires the least space while preserving all information.
 
 To get the ratio, we need to work with elapsed times
 
