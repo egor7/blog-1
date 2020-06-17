@@ -293,7 +293,7 @@ The each-both operator (`'`) needs to be escaped and we need to use ANSI-C quoti
 ### Join
 Joining two CSV files already supported by Linux command `join`. Command `csvjoin` goes further and support all types of SQL joins inner, left, right and outer. kdb+ also supports these classic join operations.
 
-For time series there is another type of joins that are frequently used. This is called asof and its generalization window join. If you have two streams of data and the times are different then asof join can merge the two streams.
+For time series there is another type of joins that are frequently used. This is called [asof](https://code.kx.com/q/ref/asof/) and its generalization [window join](https://code.kx.com/q/ref/wj/). If you have two streams of data and the times are different then asof join can merge the two streams.
 
 Let me demonstrate the usage of window join in a real-life scenario to profile distributed processes. Our main process sends request to worker processes. Each request results in multiple tasks. We store the `start` and `end` times of the requests and the `start` times and `duration` of the tasks. We would like to see the ratio of times the worker devoted to each request. Due to network delay start time of a task happens after the start time of a request. An example of the main's data is below.
 
