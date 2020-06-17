@@ -1,4 +1,4 @@
-requestID,slaveID,start,end
+requestID,workerID,start,end
 1,sl1,12:31,12:52
 2,sl2,12:31,12:50
 3,sl1,12:54,12:59

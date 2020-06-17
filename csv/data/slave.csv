@@ -1,4 +1,4 @@
-slaveID,taskID,start,duration
+workerID,taskID,start,duration
 sl1,1,12:32,1
 sl1,2,12:35,2
 sl1,3,12:37,10
