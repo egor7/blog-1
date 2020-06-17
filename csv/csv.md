@@ -64,7 +64,7 @@ Kdb+ natively supports tables that resembles a bit to Pandas/R data frames. Expo
 q) save `t.csv
 ```
 
-If you would like to chose a different name e.g. `output.csv` then use [.h.cd](https://code.kx.com/q/ref/doth/#hcd-csv-from-data)
+If you would like to chose a different name e.g. `output.csv` then use construct `0:` for saving text and the monadic [.h.cd](https://code.kx.com/q/ref/doth/#hcd-csv-from-data) for converting a kdb+ table to a list of strings
 
 ```
 q) `output.csv 0: .h.cd t
@@ -125,7 +125,7 @@ q) .csv.READLINES: count read0 `data.csv
 Let us wrap the q interpreter and the load of `csvutil.q` into a simple shell function.
 
 ```bash
-$ function qcsv { q -c 25 320 -s $(nproc --all) <<< 'system "l utils/csvutil.q";'"$1" }
+$ function qcsv { q -c 25 320 -s $(nproc --all) <<< 'system "l utils/csvutil.q";'"$1"; }
 ```
 
 The `-c 25 320` command line parameter modifies the default 25x80 console size to better display wide tables. Switch `-s` allocates multiple slaves for parallel processing. We set this value to the number of cores in your machine. Use `$(sysctl -n hw.ncpu)` if you work on a Mac.
@@ -138,7 +138,7 @@ $ qcsv '.csv.read10 `data.csv'
 
 mocks `csvlook` and displays nicely aligned the first 10 rows of `data.csv`.
 
-Whenever you would like to see more lines, use the [take operator](https://code.kx.com/q/ref/take/) (`#`) that returns a leading or trailing subset of the entity on the right, let the entity be a table, a list or a dictionary. If you would like to help junior developers and DevOps understand your code, then you can use the more explicit [sublist](https://code.kx.com/q/ref/sublist/) keyword.
+Whenever you would like to see a leading or a trailing subset of a table, use the [sublist](https://code.kx.com/q/ref/sublist/) function.
 
 ```bash
 $ qcsv '20 sublist .csv.read `data.csv'
@@ -171,6 +171,16 @@ We can use q keywords `xasc` and `xdesc` to mock `csvsort`.
 $ qcsv '`fips xdesc .csv.read `data.csv'
 ```
 
+A fantastic feature of the Unix based system is piping. You can feed output of a command as input of another command. CSVKit also follows this principle. Once the content of a CSV is converted to a kdb+ table, you probably don't want to leave this place as the power of q offers a convenient data processing environment.
+
+In real life, however, it can happen that you need to execute a black box script that accepts the input via STDIN. Our `qcsv` command can convert a kdb+ table to produce the required output. For example, in command below we massage the input CSV via q function `massage` then send the output to command `blackboxcommand`.
+
+```bash
+$ qcsv '-1 .h.cd massage .csv.read `data.csv;' | blackboxcommand
+```
+
+Don't forget about the trailing semi-colon if you would like to process the standard input.
+
 ## Exotic functions
 **q-sql is the superset of ANSI SQL**. This means that with our one-liner `qcsv` we can express complex logic that ANSI SQL cannot handle. Furthermore, q-sql is the subset of the q programming language. We can employ all features, libraries and functions of q to further massage a CSV file. These include vector operations, functional programming, advanced iterator, date and time manipulation, etc.
 
@@ -194,7 +204,9 @@ I put some  wrapper function around when most [wide-spread pivot implementation]
 ![pivot](pic/pivot.png)
 
 ### Array columns
-Nothing prevents you technically to put a list of values into a cell of a CSV. You just need to use a separator other than a comma, e.g. whitespace or semicolon. Unlike ANSI SQL, kdb+ can handle array columns. Function [.h.cd](https://code.kx.com/q/ref/doth/#hcd-csv-from-data) is also prepared for array columns when saving a kdb+ table to a CSV. You can set the secondary delimiter via [.h.d](https://code.kx.com/q/ref/doth/#hd-delimiter).
+Nothing prevents you technically to put a list of values into a cell of a CSV. You just need to use a separator other than a comma, e.g. whitespace or semicolon. Unlike ANSI SQL, kdb+ can handle array columns.
+
+We already used function [.h.cd](https://code.kx.com/q/ref/doth/#hcd-csv-from-data) co convert a kdb+ table to a list of strings before saving that to a CSV. `.h.cd` handles array columns as expected. You can set the secondary delimiter via [.h.d](https://code.kx.com/q/ref/doth/#hd-delimiter). Bear in mind that a string in q is a list thus `.h.cd` will insert spaces between the characters. It is simpler to use operator [0:](https://code.kx.com/q/ref/file-text/#prepare-text) if the table contains string columns but not list of other types.
 
 When reading the array column of a CSV it will be stored as a string column. Kdb+ function [vs](https://code.kx.com/q/ref/vs/) (that abbreviates **v**ector from **s**tring) splits a string by a separator string.
 
