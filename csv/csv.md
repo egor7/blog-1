@@ -64,11 +64,13 @@ Kdb+ natively supports tables that resembles a bit to Pandas/R data frames. Expo
 q) save `t.csv
 ```
 
-If you would like to chose a different name e.g. `output.csv` and separator `|` then
+If you would like to chose a different name e.g. `output.csv` then use [.h.cd](https://code.kx.com/q/ref/doth/#hcd-csv-from-data)
 
 ```
-q) `output.csv 0:"|"0: t
+q) `output.csv 0: .h.cd t
 ```
+
+You can even [use separators other than comma](https://code.kx.com/q/ref/file-text/#prepare-text).
 
 To import a CSV `data.csv`, you need to specify the column types and the separator. The following command assumes that the column names are in the first row.
 
@@ -192,9 +194,9 @@ I put some  wrapper function around when most [wide-spread pivot implementation]
 ![pivot](pic/pivot.png)
 
 ### Array columns
-Nothing prevents you technically to put a list of values into a cell of a CSV. You just need to use a separator other than a comma, e.g. whitespace or semicolon. Unlike ANSI SQL, kdb+ can handle array columns.
+Nothing prevents you technically to put a list of values into a cell of a CSV. You just need to use a separator other than a comma, e.g. whitespace or semicolon. Unlike ANSI SQL, kdb+ can handle array columns. Function [.h.cd](https://code.kx.com/q/ref/doth/#hcd-csv-from-data) is also prepared for array columns when saving a kdb+ table to a CSV. You can set the secondary delimiter via [.h.d](https://code.kx.com/q/ref/doth/#hd-delimiter).
 
-Kdb+ function `vs` (that abbreviates **v**ector from **s**tring) splits a string by a separator string.
+When reading the array column of a CSV it will be stored as a string column. Kdb+ function [vs](https://code.kx.com/q/ref/vs/) (that abbreviates **v**ector from **s**tring) splits a string by a separator string.
 
 ```
 q)" " vs "10 31 -42"
