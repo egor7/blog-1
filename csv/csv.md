@@ -128,7 +128,7 @@ Let us wrap the q interpreter and the load of `csvutil.q` into a simple shell fu
 $ function qcsv { q -c 25 320 -s $(nproc --all) <<< 'system "l utils/csvutil.q";'"$1"; }
 ```
 
-The `-c 25 320` command line parameter modifies the default 25x80 console size to better display wide tables. Switch `-s` allocates multiple slaves for parallel processing. We set this value to the number of cores in your machine. Use `$(sysctl -n hw.ncpu)` if you work on a Mac.
+The `-c 25 320` command line parameter modifies the default 25x80 console size to better display wide tables. Switch `-s` allocates multiple workers for parallel processing. We set this value to the number of cores in your machine. Use `$(sysctl -n hw.ncpu)` if you work on a Mac.
 
 This simple wrapper can easily achieve what csvlook, csvcut, csvgrep and csvsort are built for... and even more. For example,
 
@@ -289,9 +289,9 @@ Joining two CSV files already supported by Linux command `join`. Command `csvjoi
 
 For time series there is another type of joins that are frequently used. This is called asof and its generalization window join. If you have two streams of data and the times are different then asof join can merge the two streams.
 
-Let me demonstrate the usage of window join in a real-life scenario to profile distributed processes. Our master process sends request to slave processes. Each request results in multiple tasks. We store the `start` and `end` times of the requests and the `start` times and `duration` of the tasks. We would like to see the ratio of times the slave devoted to each request. Due to network delay start time of a task happens after the start time of a request. An example of the master's data is below.
+Let me demonstrate the usage of window join in a real-life scenario to profile distributed processes. Our main process sends request to worker processes. Each request results in multiple tasks. We store the `start` and `end` times of the requests and the `start` times and `duration` of the tasks. We would like to see the ratio of times the worker devoted to each request. Due to network delay start time of a task happens after the start time of a request. An example of the main's data is below.
 
-| requestID | slaveID | start | end |
+| requestID | workerID | start | end |
 | ---: | ---: | ---: | ---: |
 RQ1|SL1|12:31|12:52|
 RQ2|SL2|12:31|12:50|
@@ -299,9 +299,9 @@ RQ3|SL1|12:54|12:59|
 RQ4|SL3|12:51|13:00|
 RQ5|SL1|13:10|13:13|
 
-And merged slaves data is
+And merged workers data is
 
-| slaveID | taskID | start | duration |
+| workerID | taskID | start | duration |
 | ---: | ---: | ---: | ---: |
 |SL1|1|12:32|1|
 |SL1|2|12:35|2|
@@ -313,13 +313,13 @@ And merged slaves data is
 |SL3|2|12:58|1|
 |SL1|6|13:10|2|
 
-Function `wj1` helps finding the tasks with given slaveID values that happened within a time window specified by the master table's start and end columns.
+Function `wj1` helps finding the tasks with given workerID values that happened within a time window specified by the main table's start and end columns.
 
 ```
-q) m: .csv.read `master.csv
-q) s: .csv.read `slave.csv
-q) wj1[(m.start;m.end); `slaveID`start; m; (`slaveID`start xasc s; (::; `taskID))]
-requestID slaveID start end   taskID
+q) m: .csv.read `main.csv
+q) s: .csv.read `worker.csv
+q) wj1[(m.start;m.end); `workerID`start; m; (`workerID`start xasc s; (::; `taskID))]
+requestID workerID start end   taskID
 ------------------------------------
 1         sl1     12:31 12:52 1 2 3h
 2         sl2     12:31 12:50 ,1h
@@ -334,8 +334,8 @@ To get the ratio, we need to work with elapsed times
 
 ```
 q) select requestID, rate: duration % end-start from
-     wj1[(m.start;m.end); `slaveID`start; m;
-       (`slaveID`start xasc s; (sum; `duration))]
+     wj1[(m.start;m.end); `workerID`start; m;
+       (`workerID`start xasc s; (sum; `duration))]
 ```
 
 ![advanced join operation](pic/windowjoin.png)
