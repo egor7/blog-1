@@ -1,41 +1,41 @@
 # Powerful CSV processing with kdb+
 
-Comma-separated text files (CSV) are the most fundamental format for data processing. All programming languages and software that support working with relational data, also provide some level of CSV handling. You can persist and process data without installing a database management system. It is a light-way form of storing, processing and sharing data.
+Comma-separated text files (CSV) are the most fundamental format for data processing. All programming languages and software that support working with relational data, also provide some level of CSV handling. You can persist and process data without installing a database management system. It is a lightweight form of storing, processing and sharing data.
 
-The CSV format predates personal computers and has been one of the most common data exchange format for almost 50 years. CSV files will remain with us in the future. Working with this format efficiently is a core requirement of a productive developer, data engineer, DevOps person, etc..
+The CSV format predates personal computers and has been one of the most common data exchange format for almost 50 years. CSV files will remain with us in the future. Working with this format efficiently is a core requirement of a productive developer, data engineer, DevOps person, etc…
 
 In this article I review available tools to process CSV files and then show how kdb+ and its query language q raise CSV processing to a new level of performance and simplicity.
 
 ## Linux command line tools
-Linux shells, like Bash, support array. You can read a CSV line-by-line and store all fields in an array variable. You can use built-in string manipulation and integer calculations (even float calculation with e.g `bc -l`) to operate on cell values. The code will be lengthy that hard to maintain.
+Linux shells, like Bash, support arrays. You can read a CSV line-by-line and store all fields in an array variable. You can use built-in string manipulation and integer calculations (even float calculations with e.g `bc -l`) to operate on cell values. The code will be lengthy and hard to maintain.
 
-General text processing tools like [`awk`](https://en.wikipedia.org/wiki/AWK) and [`sed`](https://en.wikipedia.org/wiki/Sed) scripts may result in shorter and simpler code. Commands like [`cut`](https://en.wikipedia.org/wiki/Cut_(Unix)), [`sort`](https://en.wikipedia.org/wiki/Sort_(Unix)), [`uniq`](https://en.wikipedia.org/wiki/Uniq) and [`paste`](https://en.wikipedia.org/wiki/Paste_(Unix)) further simplifies CSV processing. You can specify the separator and **refer to fields by positions**.
+General text processing tools like [`awk`](https://en.wikipedia.org/wiki/AWK) and [`sed`](https://en.wikipedia.org/wiki/Sed) scripts may result in shorter and simpler code. Commands like [`cut`](https://en.wikipedia.org/wiki/Cut_(Unix)), [`sort`](https://en.wikipedia.org/wiki/Sort_(Unix)), [`uniq`](https://en.wikipedia.org/wiki/Uniq) and [`paste`](https://en.wikipedia.org/wiki/Paste_(Unix)) further simplify CSV processing. You can specify the separator and **refer to fields by positions**.
 
-The world is constantly changing. So do CSV files. Position-based reference breaks if new a column is added ahead of the referred column or columns are shuffled e.g. to move related columns next to each other. The problem manifests silently, maybe your scripts run fine, you just use a different column in your calculation. If you don't have a regression testing framework to safeguard your codebase, then the end-user (or your competitor) might discover the problem. This can be embarrassing.
+The world is constantly changing. So do CSV files. Position-based reference breaks if a new column is added ahead of the referred column or columns are shuffled e.g. to move related columns next to each other. The problem manifests silently: your scripts may run smoothly, but you just use a different column in your calculation! If you don’t have a regression-testing framework to safeguard your codebase, then the end-user (or your competitor) might discover the problem. This can be embarrassing.
 
-Position based reference creates fragile code. Processing CSV by these Linux commands is great for prototyping and to do a quick analyses but you bump into the limits once your codebase starts increasing or you share scripts with other colleagues. No wonder that in SQL the position based column reference is limited and discouraged.
+Position-based reference creates fragile code. Processing CSV by these Linux commands is great for prototyping and for quick analysis but you hit the limits once your codebase starts increasing or you share scripts with other colleagues. No wonder that in SQL the position-based column reference is limited and discouraged.
 
-You can **refer to a column by name**. The column names are stored in the first row of the CSV. Reference by name is sensitive to column renaming but probably this happens less frequently than adding or reshuffling columns.
+You can **refer to a column by name**. The column names are stored in the first row of the CSV. Reference by name is sensitive to column renaming but this probably happens less frequently than adding or reshuffling columns.
 
-The huge benefit of Linux command line tools is that no installation is required. Your shell script will likely run on other's Linux systems. Get familiar with Linux tools but refrain from using them in complex tasks. Remember that the separator is specified by `-t` command line option for [`sort`](https://en.wikipedia.org/wiki/Sort_(Unix)) and `-d` for the other commands, [`cut`](https://en.wikipedia.org/wiki/Cut_(Unix)), [`paste`](https://en.wikipedia.org/wiki/Paste_(Unix)).
+The huge advantage of Linux command-line tools is that no installation is required. Your shell script will likely run on other's Linux systems. Get familiar with Linux tools but refrain from using them in complex tasks. Remember that the separator is specified by `-t` command line option for [`sort`](https://en.wikipedia.org/wiki/Sort_(Unix)) and `-d` for the other commands, [`cut`](https://en.wikipedia.org/wiki/Cut_(Unix)), [`paste`](https://en.wikipedia.org/wiki/Paste_(Unix)).
 
 ## CSVKit
 
-There are many open source libraries on Github with the aim of CSV support. Python library [CSVKit](https://csvkit.readthedocs.io/en/latest/#) is one of the most popular tools. It offers a more robust solution than native Linux commands. Most importantly, CSVKit commands allow reference by column name.
+Many open-source libraries on GitHub offer CSV support. Python library [CSVKit](https://csvkit.readthedocs.io/en/latest/#) is one of the most popular. It offers a more robust solution than native Linux commands. Most importantly, CSVKit commands allow reference by column name.
 
-Also they are better in handling the first column separately than the general-purpose text tools. Linux command `sort` treats the first row as normal row and can place it in the middle of the output. Similarly `cat` is not skipping the first rows when you concatenate multiple CSV files. Commands `csvsort` and `csvstack` handle first rows as properly.
+Also they handle the first rows better than the general-purpose text tools do. Linux command `sort` treats the first row as any other row and can place it in the middle of the output. Similarly `cat` includes the first rows when you concatenate multiple CSV files. Commands `csvsort` and `csvstack` handle first rows as properly.
 
 Finally, the CSVKit developers took special care to provide consistent command line parameters, e.g. separator is defined by `-d`.
 
-The naming is coherent, [`csvcut`](https://csvkit.readthedocs.io/en/latest/scripts/csvcut.html), [`csvgrep`](https://csvkit.readthedocs.io/en/latest/scripts/csvgrep.html) and [`csvsort`](https://csvkit.readthedocs.io/en/latest/scripts/csvsort.html) replace traditional Linux commands `cut`, `grep` and `sort`. Nonetheless, the merit of the Linux commands is their speed, probably attributed to the fact that they were written in C.
+The naming is coherent, [`csvcut`](https://csvkit.readthedocs.io/en/latest/scripts/csvcut.html), [`csvgrep`](https://csvkit.readthedocs.io/en/latest/scripts/csvgrep.html) and [`csvsort`](https://csvkit.readthedocs.io/en/latest/scripts/csvsort.html) replace traditional Linux commands `cut`, `grep` and `sort`. Nonetheless, the merit of the Linux commands is their speed, probably because they were written in C.
 
-You probably use Linux commands [`head`](https://en.wikipedia.org/wiki/Head_(Unix)), [`tail`](https://en.wikipedia.org/wiki/Tail_(Unix)), [`less`](https://en.wikipedia.org/wiki/Less_(Unix))/[`more`](https://en.wikipedia.org/wiki/More_(command)) and [`cat`](https://en.wikipedia.org/wiki/Cat_(Unix)) to take a quick look at the content of a text file. Unfortunately the output of these tools for CSV files is not appealing. The columns are not aligned and you will spend a lot of time squinting a black and white screen figuring out to which column a given cell belongs. You may give up and import the data into Excel or Google Sheet. However the file is on a remote machine so first you need to SCP the file to your desktop. You can save time and work in the console by using [`csvlook`](https://csvkit.readthedocs.io/en/latest/scripts/csvlook.html). Command `csvlook` nicely aligns column under the column name.
+You probably use Linux commands [`head`](https://en.wikipedia.org/wiki/Head_(Unix)), [`tail`](https://en.wikipedia.org/wiki/Tail_(Unix)), [`less`](https://en.wikipedia.org/wiki/Less_(Unix))/[`more`](https://en.wikipedia.org/wiki/More_(command)) and [`cat`](https://en.wikipedia.org/wiki/Cat_(Unix)) to take a quick look at the content of a text file. Unfortunately the output of these tools is not appealing for CSV files. The columns are not aligned and you will spend a lot of time squinting a monochrome screen figuring out to which column a given cell belongs. You might give up and import the data into Excel or Google Sheet. However if the file is on a remote machine you first need to SCP it to your desktop. You can save time and work in the console by using [`csvlook`](https://csvkit.readthedocs.io/en/latest/scripts/csvlook.html). Command `csvlook` nicely aligns column under the column name.
 
 ```bash
 $ csvlook --max-rows 20 data.csv
 ```
 
-Don't worry if your console is narrow, pipe the output to `less -S` and use arrow keys to move left and right.
+Don’t worry if your console is narrow: pipe the output to `less -S` and use arrow keys to move left and right.
 
 Another useful extension of CSV tools is command [`csvstat`](https://csvkit.readthedocs.io/en/latest/scripts/csvstat.html). It analyzes the content and displays statistics like the number of distinct values of all columns. Also, it tries to infer types. If the column type is a number then it also returns maximum, minimum, mean, median, and standard deviation of the values.
 
@@ -43,36 +43,36 @@ To perform aggregations, filtering and grouping, you can use the generic command
 
 ## xsv
 
-Some CSVKit commands are slow because they load the entire file into the memory and creates an in-memory database. Rust developers reimplemented several traditional tools like `cat`, `ls`, `grep` and `find` and tools like [`bat`](https://github.com/sharkdp/bat), [`exa`](https://github.com/ogham/exa), [`ripgrep`](https://github.com/BurntSushi/ripgrep) and [`fd`](https://github.com/sharkdp/fd) were born. No wonder that they also created a performant tool for CSV processing, library [`xsv`](https://github.com/BurntSushi/xsv).
+Some CSVKit commands are slow because they load the entire file into the memory and create an in-memory database. Rust developers reimplemented several traditional tools like `cat`, `ls`, `grep` and `find` and tools like [`bat`](https://github.com/sharkdp/bat), [`exa`](https://github.com/ogham/exa), [`ripgrep`](https://github.com/BurntSushi/ripgrep) and [`fd`](https://github.com/sharkdp/fd) were born. No wonder they also created a performant tool for CSV processing, library [`xsv`](https://github.com/BurntSushi/xsv).
 
 The library also supports selecting column, filtering, sorting and joining CSV. An index can be added to CSV files that are frequently processed to speed up operations. It is an elegant and lightweight step towards DBMS.
 
 
-## Type Inference
-CSV is a text file, there is no type information associated with the columns. Strings can be converted to a type based on its value. If all values of a column matches the pattern `YYYY.MM.DD` then we can conclude that the column stores date. But how shall we treat the literal 100000? Is it an integer, or a time 10am? Maybe the upstream process only supports digits hence the time separators are missing? In real life, information about the upstream is not always available and you need to reverse engineering the data. If all values of the column matches `HHMMSS` string then we **can** conclude with high confidence that the column stores time values. We can follow two approaches to make a decision.
+## Type inference
+CSV is a text file, and holds no type information for the columns. A string can be converted to a datatype based on its value. If all values of a column matches the pattern `YYYY.MM.DD` we can conclude that the column holds date. But how shall we treat the literal 100000? Is it an integer, or a time 10:00:00? Maybe the source process only supports digits and omitted the time separators? In real life, information about the source is not always available and you need to reverse engineer the data. If all values of the column matches `HHMMSS` string then we **can** conclude with high confidence that the column holds time values. We can follow two approaches to make a decision.
 
-First, we could be strict, i.e. we predefine the pattern that any type needs to match. The patterns are not overlapping. If time is defined as `HH:MM:SS` and integers as `[1-9][0-9]*` then 100000 is an integer.
+First, we could be strict, i.e. we predefine the pattern that any type needs to match. The patterns do not overlap. If time is defined as `HH:MM:SS` and integers as `[1-9][0-9]*` then 100000 is an integer.
 
-Second, we could let patterns overlap and in case of conflict we choose the type with the smaller domain or based on some rules. This approach prefers time over int for 100000 if time pattern also contains `HHMMSS`.
+Second, we could let patterns overlap and in case of conflict we choose the type with the smaller domain or based on some rules. This approach prefers time over int for 100000 if the time pattern also contains `HHMMSS`.
 
-Library CSVkit implements the first approach.
+Library CSVKit implements the first approach.
 
 ## kdb+
-Kdb+ natively supports tables that resembles a bit to Pandas/R data frames. Exporting and importing CSV files is part of the core language. Table `t` can be saved by command
+Kdb+ natively supports tables that resemble to Pandas/R data frames. Exporting and importing CSV files is part of the core language. Table `t` can be saved by command
 
 ```
 q) save `t.csv
 ```
 
-If you would like to chose a different name e.g. `output.csv` then use construct `0:` for saving text and the monadic [`.h.cd`](https://code.kx.com/q/ref/doth/#hcd-csv-from-data) for converting a kdb+ table to a list of strings
+To chose a different name, e.g. `output.csv` then use the File Text operator `0:` for saving text and the utility [`.h.cd`](https://code.kx.com/q/ref/doth/#hcd-csv-from-data) to convert a kdb+ table to a list of strings
 
 ```
 q) `output.csv 0: .h.cd t
 ```
 
-You can even [use separators other than comma](https://code.kx.com/q/ref/file-text/#prepare-text).
+You can also use [other separators](https://code.kx.com/q/ref/file-text/#prepare-text) than comma.
 
-To import a CSV `data.csv`, you need to specify the column types and the separator. The following command assumes that the column names are in the first row.
+To import a CSV `data.csv`, specify the column types and the separator. The following command assumes the column names are in the first row.
 
 ```
 q) ("JFDS* I"; enlist csv) 0:hsym `data.csv
