@@ -126,7 +126,7 @@ Let us wrap the q interpreter and the load of `csvutil.q` into a simple shell fu
 $ function qcsv { q -c 25 320 -s $(nproc --all) <<< 'system "l utils/csvutil.q";'"$1"; }
 ```
 
-The `-c 25 320` command line parameter modifies the default 25x80 console size to better display wide tables. Switch `-s` allocates multiple secondary/workers for parallel processing. We set this value to the number of cores in your machine. Use `$(sysctl -n hw.ncpu)` if you work on a Mac. You can verify the setting by executing
+The `-c 25 320` command line parameter modifies the default 25x80 console size to better display wide tables. Switch `-s` allocates multiple threads for parallel processing. We set this value to the number of cores in your machine. Use `$(sysctl -n hw.ncpu)` if you work on a Mac. You can verify the setting by executing
 
 ```
 $ qcsv 'system "s"'
