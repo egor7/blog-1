@@ -75,7 +75,7 @@ You can even [use separators other than comma](https://code.kx.com/q/ref/file-te
 To import a CSV `data.csv`, you need to specify the column types and the separator. The following command assumes that the column names are in the first row.
 
 ```
-q) ("JFDS* I";enlist",") 0:hsym `data.csv
+q) ("JFDS* I"; enlist csv) 0:hsym `data.csv
 ```
 
 The type encoding is available on the [kdb+ reference card](https://code.kx.com/q/ref/#datatypes), `I` stands for integer, `J` for long, `D` for date, etc. Use white spaces to ignore columns. Character `*` denotes string.
@@ -231,7 +231,7 @@ Like many functions in kdb+, `vs` can be either used in infix notation or as nor
 q) vs[" "; "10 31 -42"]
 ```
 
-kdb+ supports functional programming. You can easily apply a monadic function to a list via the `each` operator. This is similar to Python's function `map`. Furthermore you can derive a monadic function from a dyadic function by binding a parameter. This is called [projection](https://code.kx.com/q4m3/6_Functions/#64-projection) in kdb+ parlance. Putting this together we can split a list of strings by a whitespace as per
+kdb+ supports functional programming. You can easily apply a monadic function to a list via the `each` operator. This is similar to Python's function `map`. Furthermore you can derive a monadic function from a dyadic function by binding a parameter. This is called [projection](https://code.kx.com/q4m3/6_Functions/#64-projection) in kdb+ nomenclature. Putting this together we can split a list of strings by a whitespace as per
 
 ```
 q) vs[" "] each ("10 31 -42"; "104 105 107")
