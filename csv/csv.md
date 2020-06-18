@@ -104,8 +104,6 @@ Function `.csv.read` is just a wrapper around the general function `.csv.data` t
 ```
 q).csv.read
 {[file] data[file; info[file]]}
-q).csv.basicread
-{[file] data[file; basicinfo[file]]}
 ```
 
 The column meta-data table is a bit similar to `csvstat` output.
