@@ -140,7 +140,9 @@ This simple wrapper can easily achieve what csvlook, csvcut, csvgrep and csvsort
 $ qcsv '.csv.read10 `data.csv'
 ```
 
-mocks `csvlook` and displays nicely aligned the first 10 rows of `data.csv`.
+mocks `csvlook` and displays nicely aligned the first 10 rows of `data.csv`. You can pipe the output to `less -S` for wide tables.
+
+![qcsv mocks csvlook](pic/qmockscsvlook.png)
 
 Whenever you would like to see a leading or a trailing subset of a table, use the [sublist](https://code.kx.com/q/ref/sublist/) function.
 
