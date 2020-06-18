@@ -4,12 +4,12 @@ Comma-separated text files (CSV) are the most fundamental format for data proces
 
 The CSV format predates personal computers and has been one of the most common data exchange format for almost 50 years. CSV files will remain with us in the future. Working with this format efficiently is a core requirement of a productive developer, data engineer, DevOps person, etc..
 
-In this article I review available tools to process CSV files and then show how kdb+ raises CSV processing to a new level both in performance and in simplicity.
+In this article I review available tools to process CSV files and then show how kdb+ and its query language q raise CSV processing to a new level of performance and simplicity.
 
 ## Linux command line tools
 Linux shells, like Bash, support array. You can read a CSV line-by-line and store all fields in an array variable. You can use built-in string manipulation and integer calculations (even float calculation with e.g `bc -l`) to operate on cell values. The code will be lengthy that hard to maintain.
 
-General text processing tools like [awk](https://en.wikipedia.org/wiki/AWK) and [sed](https://en.wikipedia.org/wiki/Sed) scripts may result in shorter and simpler code. Commands like [cut](https://en.wikipedia.org/wiki/Cut_(Unix)), [sort](https://en.wikipedia.org/wiki/Sort_(Unix)), [uniq](https://en.wikipedia.org/wiki/Uniq) and [paste](https://en.wikipedia.org/wiki/Paste_(Unix)) further simplifies CSV processing. You can specify the separator and **refer to fields by positions**.
+General text processing tools like [`awk`](https://en.wikipedia.org/wiki/AWK) and [`sed`](https://en.wikipedia.org/wiki/Sed) scripts may result in shorter and simpler code. Commands like [`cut`](https://en.wikipedia.org/wiki/Cut_(Unix)), [`sort`](https://en.wikipedia.org/wiki/Sort_(Unix)), [`uniq`](https://en.wikipedia.org/wiki/Uniq) and [`paste`](https://en.wikipedia.org/wiki/Paste_(Unix)) further simplifies CSV processing. You can specify the separator and **refer to fields by positions**.
 
 The world is constantly changing. So do CSV files. Position-based reference breaks if new a column is added ahead of the referred column or columns are shuffled e.g. to move related columns next to each other. The problem manifests silently, maybe your scripts run fine, you just use a different column in your calculation. If you don't have a regression testing framework to safeguard your codebase, then the end-user (or your competitor) might discover the problem. This can be embarrassing.
 
@@ -17,7 +17,7 @@ Position based reference creates fragile code. Processing CSV by these Linux com
 
 You can **refer to a column by name**. The column names are stored in the first row of the CSV. Reference by name is sensitive to column renaming but probably this happens less frequently than adding or reshuffling columns.
 
-The huge benefit of Linux command line tools is that no installation is required. Your shell script will likely run on other's Linux systems. Get familiar with Linux tools but refrain from using them in complex tasks. Remember that the separator is specified by `-t` command line option for [sort](https://en.wikipedia.org/wiki/Sort_(Unix)) and `-d` for the other commands, [cut](https://en.wikipedia.org/wiki/Cut_(Unix)), [paste](https://en.wikipedia.org/wiki/Paste_(Unix)).
+The huge benefit of Linux command line tools is that no installation is required. Your shell script will likely run on other's Linux systems. Get familiar with Linux tools but refrain from using them in complex tasks. Remember that the separator is specified by `-t` command line option for [`sort`](https://en.wikipedia.org/wiki/Sort_(Unix)) and `-d` for the other commands, [`cut`](https://en.wikipedia.org/wiki/Cut_(Unix)), [`paste`](https://en.wikipedia.org/wiki/Paste_(Unix)).
 
 ## CSVKit
 
@@ -27,9 +27,9 @@ Also they are better in handling the first column separately than the general-pu
 
 Finally, the CSVKit developers took special care to provide consistent command line parameters, e.g. separator is defined by `-d`.
 
-The naming is coherent, [csvcut](https://csvkit.readthedocs.io/en/latest/scripts/csvcut.html), [csvgrep](https://csvkit.readthedocs.io/en/latest/scripts/csvgrep.html) and [csvsort](https://csvkit.readthedocs.io/en/latest/scripts/csvsort.html) replace traditional Linux commands `cut`, `grep` and `sort`. Nonetheless, the merit of the Linux commands is their speed, probably attributed to the fact that they were written in C.
+The naming is coherent, [`csvcut`](https://csvkit.readthedocs.io/en/latest/scripts/csvcut.html), [`csvgrep`](https://csvkit.readthedocs.io/en/latest/scripts/csvgrep.html) and [`csvsort`](https://csvkit.readthedocs.io/en/latest/scripts/csvsort.html) replace traditional Linux commands `cut`, `grep` and `sort`. Nonetheless, the merit of the Linux commands is their speed, probably attributed to the fact that they were written in C.
 
-You probably use Linux commands [head](https://en.wikipedia.org/wiki/Head_(Unix)), [tail](https://en.wikipedia.org/wiki/Tail_(Unix)), [less](https://en.wikipedia.org/wiki/Less_(Unix))/[more](https://en.wikipedia.org/wiki/More_(command)) and [cat](https://en.wikipedia.org/wiki/Cat_(Unix)) to take a quick look at the content of a text file. Unfortunately the output of these tools for CSV files is not appealing. The columns are not aligned and you will spend a lot of time squinting a black and white screen figuring out to which column a given cell belongs. You may give up and import the data into Excel or Google Sheet. However the file is on a remote machine so first you need to SCP the file to your desktop. You can save time and work in the console by using [csvlook](https://csvkit.readthedocs.io/en/latest/scripts/csvlook.html). Command `csvlook` nicely aligns column under the column name.
+You probably use Linux commands [`head`](https://en.wikipedia.org/wiki/Head_(Unix)), [`tail`](https://en.wikipedia.org/wiki/Tail_(Unix)), [`less`](https://en.wikipedia.org/wiki/Less_(Unix))/[`more`](https://en.wikipedia.org/wiki/More_(command)) and [`cat`](https://en.wikipedia.org/wiki/Cat_(Unix)) to take a quick look at the content of a text file. Unfortunately the output of these tools for CSV files is not appealing. The columns are not aligned and you will spend a lot of time squinting a black and white screen figuring out to which column a given cell belongs. You may give up and import the data into Excel or Google Sheet. However the file is on a remote machine so first you need to SCP the file to your desktop. You can save time and work in the console by using [`csvlook`](https://csvkit.readthedocs.io/en/latest/scripts/csvlook.html). Command `csvlook` nicely aligns column under the column name.
 
 ```bash
 $ csvlook --max-rows 20 data.csv
@@ -37,13 +37,13 @@ $ csvlook --max-rows 20 data.csv
 
 Don't worry if your console is narrow, pipe the output to `less -S` and use arrow keys to move left and right.
 
-Another useful extension of CSV tools is command [csvstat](https://csvkit.readthedocs.io/en/latest/scripts/csvstat.html). It analyzes the content and displays statistics like the number of distinct values of all columns. Also, it tries to infer types. If the column type is a number then it also returns max/min/mean/median/stddev of the values.
+Another useful extension of CSV tools is command [`csvstat`](https://csvkit.readthedocs.io/en/latest/scripts/csvstat.html). It analyzes the content and displays statistics like the number of distinct values of all columns. Also, it tries to infer types. If the column type is a number then it also returns maximum, minimum, mean, median, and standard deviation of the values.
 
-To perform aggregations, filtering and grouping, you can use the generic command [csvsql](https://csvkit.readthedocs.io/en/latest/scripts/csvsql.html) that lets you run ANSI SQL commands on CSV files.
+To perform aggregations, filtering and grouping, you can use the generic command [`csvsql`](https://csvkit.readthedocs.io/en/latest/scripts/csvsql.html) that lets you run ANSI SQL commands on CSV files.
 
 ## xsv
 
-Some CSVKit commands are slow because they load the entire file into the memory and creates an in-memory database. Rust developers reimplemented several traditional tools like `cat`, `ls`, `grep` and `find` and tools like [bat](https://github.com/sharkdp/bat), [exa](https://github.com/ogham/exa), [ripgrep](https://github.com/BurntSushi/ripgrep) and [fd](https://github.com/sharkdp/fd) were born. No wonder that they also created a performant tool for CSV processing, library [xsv](https://github.com/BurntSushi/xsv).
+Some CSVKit commands are slow because they load the entire file into the memory and creates an in-memory database. Rust developers reimplemented several traditional tools like `cat`, `ls`, `grep` and `find` and tools like [`bat`](https://github.com/sharkdp/bat), [`exa`](https://github.com/ogham/exa), [`ripgrep`](https://github.com/BurntSushi/ripgrep) and [`fd`](https://github.com/sharkdp/fd) were born. No wonder that they also created a performant tool for CSV processing, library [`xsv`](https://github.com/BurntSushi/xsv).
 
 The library also supports selecting column, filtering, sorting and joining CSV. An index can be added to CSV files that are frequently processed to speed up operations. It is an elegant and lightweight step towards DBMS.
 
@@ -51,9 +51,9 @@ The library also supports selecting column, filtering, sorting and joining CSV. 
 ## Type Inference
 CSV is a text file, there is no type information associated with the columns. Strings can be converted to a type based on its value. If all values of a column matches the pattern `YYYY.MM.DD` then we can conclude that the column stores date. But how shall we treat the literal 100000? Is it an integer, or a time 10am? Maybe the upstream process only supports digits hence the time separators are missing? In real life, information about the upstream is not always available and you need to reverse engineering the data. If all values of the column matches `HHMMSS` string then we **can** conclude with high confidence that the column stores time values. We can follow two approaches to make a decision.
 
-First, we can be strict, i.e. we predefine the pattern that any type needs to match. The patterns are not overlapping. If time is defined as `HH:MM:SS` and integers as `[1-9][0-9]*` then 100000 is an integer.
+First, we could be strict, i.e. we predefine the pattern that any type needs to match. The patterns are not overlapping. If time is defined as `HH:MM:SS` and integers as `[1-9][0-9]*` then 100000 is an integer.
 
-Second, we let patterns overlap and in case of conflict we choose the type with the smaller domain or based on some rules. This approach prefers time over int for 100000 if time pattern also contains `HHMMSS`.
+Second, we could let patterns overlap and in case of conflict we choose the type with the smaller domain or based on some rules. This approach prefers time over int for 100000 if time pattern also contains `HHMMSS`.
 
 Library CSVkit implements the first approach.
 
@@ -64,7 +64,7 @@ Kdb+ natively supports tables that resembles a bit to Pandas/R data frames. Expo
 q) save `t.csv
 ```
 
-If you would like to chose a different name e.g. `output.csv` then use construct `0:` for saving text and the monadic [.h.cd](https://code.kx.com/q/ref/doth/#hcd-csv-from-data) for converting a kdb+ table to a list of strings
+If you would like to chose a different name e.g. `output.csv` then use construct `0:` for saving text and the monadic [`.h.cd`](https://code.kx.com/q/ref/doth/#hcd-csv-from-data) for converting a kdb+ table to a list of strings
 
 ```
 q) `output.csv 0: .h.cd t
@@ -78,7 +78,7 @@ To import a CSV `data.csv`, you need to specify the column types and the separat
 q) ("JFDS* I"; enlist csv) 0:hsym `data.csv
 ```
 
-The type encoding is available on the [kdb+ reference card](https://code.kx.com/q/ref/#datatypes), `I` stands for integer, `J` for long, `D` for date, etc. Use white spaces to ignore columns. Character `*` denotes string.
+The type encoding is available on the [kdb+ reference card](https://code.kx.com/q/ref/#datatypes), `I` stands for integer, `J` for long, `D` for date, etc. Use spaces to ignore columns. Character `*` denotes string.
 
 Specifying types manually has high maintenance costs, is laborious for wide CSV files and is prone to error. Inserting a single new column can break the code.
 
@@ -93,7 +93,7 @@ q) .csv.read `data.csv
 
 ![displaying CSV content by .csv.read](pic/csvread.png)
 
-Scripts `csvguess.q` allows saving a meta-information about the columns. Developers can review and adjust the type column and use the meta-data in production to load CSV with proper type. The two scripts have different users. Data scientists prefer `csvutil.q` for their ad hoc analyses. When IT is setting up a kdb+ CSV feed then they use assisted meta-data export and import feature of `csvguess.q`. The type hints provides a less error prone solution than manually entering types for all columns.
+Scripts `csvguess.q` allows saving a meta-information about the columns. Developers can review and adjust the type column and use the meta-data in production to load CSV with proper type. The two scripts have different users. Data scientists prefer `csvutil.q` for ad hoc analyses. When IT staff configure a kdb+ CSV feed then they use assisted meta-data export and import feature of `csvguess.q`. The type hints provide a less error prone solution than manually entering types for all columns.
 
 ### Type conversion
 
@@ -126,13 +126,13 @@ Let us wrap the q interpreter and the load of `csvutil.q` into a simple shell fu
 $ function qcsv { q -c 25 320 -s $(nproc --all) <<< 'system "l utils/csvutil.q";'"$1"; }
 ```
 
-The `-c 25 320` command line parameter modifies the default 25x80 console size to better display wide tables. Switch `-s` allocates multiple threads for parallel processing. We set this value to the number of cores in your machine. Use `$(sysctl -n hw.ncpu)` if you work on a Mac. You can verify the setting by executing
+The `-c 25 320` command line parameter modifies the default 25×80 console size to display wide tables better. Switch `-s` allocates multiple threads for parallel processing. We set this value to the number of cores in your machine. Use `$(sysctl -n hw.ncpu)` if you work on a Mac. You can verify the setting by executing
 
 ```
 $ qcsv 'system "s"'
 ```
 
-that displays the number of worker threads allocated for `qcsv`.
+to displays the number of worker threads allocated for `qcsv`.
 
 This simple wrapper can easily achieve what csvlook, csvcut, csvgrep and csvsort are built for... and even more. For example,
 
@@ -295,7 +295,7 @@ Joining two CSV files already supported by Linux command `join`. Command `csvjoi
 
 For time series there is another type of joins that are frequently used. This is called [asof](https://code.kx.com/q/ref/asof/) and its generalization [window join](https://code.kx.com/q/ref/wj/). If you have two streams of data and the times are different then asof join can merge the two streams.
 
-Let me demonstrate the usage of window join in a real-life scenario to profile distributed processes. Our main process sends request to worker processes. Each request results in multiple tasks. We store the `start` and `end` times of the requests and the `start` times and `duration` of the tasks. We would like to see the ratio of times the worker devoted to each request. Due to network delay start time of a task happens after the start time of a request. An example of the main's data is below.
+Let me demonstrate the usage of window join in a real-life scenario to profile distributed processes. Our main process sends request to worker processes. Each request results in multiple tasks. We store the `start` and `end` times of the requests and the `start` times and `duration` of the tasks. We would like to see the ratio of times the worker devoted to each request. Due to network delay start time of a task happens after the start time of a request. An example of the main process data is below.
 
 | requestID | workerID | start | end |
 | ---: | ---: | ---: | ---: |
@@ -347,7 +347,7 @@ q) select requestID, rate: duration % end-start from
 ![advanced join operation](pic/windowjoin.png)
 
 ## Performance
-Let us compare the performance of executing a simple aggregation on publicly available CSV also used in benchmarking the `xsv` package. The file is 145 MByte large and contains almost 32 million lines.
+Let us compare the performance of executing a simple aggregation on publicly available CSV also used in benchmarking the `xsv` package. The 145 MByte file contains almost 32 million lines.
 
 ```bash
 $ curl -LO https://burntsushi.net/stuff/worldcitiespop.csv
@@ -355,7 +355,7 @@ $ curl -LO https://burntsushi.net/stuff/worldcitiespop.csv
 
 We would like to see the top 10 regions by population. We need to sum the population of the cities of each region. Package xsv does not support aggregation thus it is out of the game.
 
-The kdb+ query is simple.
+The q query is simple.
 
 ```bash
 $ qcsv '10 sublist `Population xdesc select sum Population by Region from .csv.basicread `worldcitiespop.csv'
@@ -386,9 +386,9 @@ The run times in seconds are displayed below. The second row corresponds to the 
 | 220 | 23 | 13 | 2 |
 | OUT OF MEM | 102 | OUT OF MEM | 6 |
 
-kdb+ is famous for its stunning speed. Benchmarks so far focused on data that resides either in-memory or on disk using its proprietary format. Supporting CSV is a nice-to-have feature of the language. However, the extreme optimization, the support of vector operations and the inherent parallelization pays off, kdb+ significantly outperforms tools that are build for CSV analyses. The execution times directly translate to productivity. How much it cost you if the query returns in almost 4 minutes vs. it returns in 2 seconds? What do your developers do when their workflow is constantly interrupted by minutes-long wait phases.
+kdb+ is famous for its stunning speed. Benchmarks tend to focus on data that resides either in-memory or on disk using its proprietary format. CSV support is a useful feature of the language. However, the extreme optimization, the support of vector operations and the inherent parallelization pays off: kdb+ significantly outperforms tools purpose-built for CSV analysis. The execution speed translates directly to productivity. How much does it cost you if the query returns in almost 4 minutes instead of 2 seconds? What do developers do if repeatedly interrupted by minutes-long wait phases?
 
 The test run on a `n1-standard-4` GCP virtual machine. The run times of the kdb+ based solution would further drop with machines of more cores, as kdb+ 4 could better make use of the [multithreaded primitives](https://code.kx.com/q/kb/mt-primitives/).
 
 ## Conclusion
-There are many tools out there to process CSV files. kdb+ has an excellent open source library `csvutil.q`/`csvguess.q` that have sophisticated type inference engine. Once you converted the CSV into a kdb+ in-memory table, you can easily cope with problems the other tools cannot handle or requires unnecessary complexity. You can express complex logic in a readable way that is easy to maintain, executes fast simply by wrapping the q interpreter that loads the library into a shell function.
+Many tools out there to process CSV files. kdb+ has an excellent open source library `csvutil.q`/`csvguess.q` with a sophisticated type inference engine. Once you converted CSV into a kdb+ in-memory table, you can easily cope with problems other tools handle only with difficulty - if at all. You can express complex logic in a readable way that is easy to maintain and executes fast simply by wrapping the q interpreter that loads the library into a shell function.
