@@ -151,7 +151,7 @@ $ qcsv '20 sublist .csv.read `data.csv'
 ```
 
 ### Filtering, selecting columns, sorting
-Once we have a kdb+ table, we can use the full power of q-sql to do any data manipulation. To select columns.
+Once we have a kdb+ table, we can use the full power of q-sql to do any data manipulation. To select columns
 
 ```bash
 $ qcsv 'select nsn,item_name from .csv.read `data.csv'
@@ -188,7 +188,7 @@ $ qcsv '-1 .h.cd massage .csv.read `data.csv;' | blackboxcommand
 Don't forget about the trailing semi-colon if you would like to process the standard input.
 
 ## Exotic functions
-**q-sql is the superset of ANSI SQL**. This means that with our one-liner `qcsv` we can express complex logic that ANSI SQL cannot handle. Furthermore, q-sql is the subset of the q programming language. We can employ all features, libraries and functions of q to further massage a CSV file. These include vector operations, functional programming, advanced iterator, date and time manipulation, etc.
+**q-sql is the superset of ANSI SQL**. This means that with our one-liner `qcsv` we can express complex logic that ANSI SQL cannot handle. Furthermore, q-sql is the subset of the q programming language. We can employ all features, libraries and functions of q to further massage a CSV file. These include vector operations, functional programming, advanced iterators, date/time and string manipulation, etc.
 
 Furthermore, we can load the business logic that we use in production. **It is like employing the stored procedures of our DBMS to analyze a local CSV. Kdb+ provides a single solution for streaming, in-memory, historic data processing that you can also leverage in your ad hoc data analyses.**
 
