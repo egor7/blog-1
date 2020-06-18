@@ -132,7 +132,7 @@ The `-c 25 320` command line parameter modifies the default 25×80 console size 
 $ qcsv 'system "s"'
 ```
 
-to displays the number of worker threads allocated for `qcsv`.
+to display the number of worker threads allocated for `qcsv`.
 
 This simple wrapper can easily achieve what csvlook, csvcut, csvgrep and csvsort are built for... and even more. For example,
 
