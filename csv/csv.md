@@ -179,40 +179,40 @@ $ qcsv '`fips xdesc .csv.read `data.csv'
 
 A fantastic feature of the Unix-based system is piping: pass the output from a command as the input to another command. CSVKit also follows this principle. Once the content of a CSV is converted to a kdb+ table, you probably want to stay in this place as the power of q offers a convenient and powerful data-processing environment.
 
-In real life, however, it can happen that you need to execute a black-box script that accepts the input via STDIN. Our `qcsv` command can convert a kdb+ table to produce the required output. For example, in command below we massage the input CSV via q function `massage` then send the output to command `blackboxcommand`.
+In real life, however, it can happen that you need to execute a black-box script that accepts the input via STDIN. Our `qcsv` command can convert a kdb+ table to produce the required output. For example, in the command below we massage the input CSV via q function `massage` then send the output to command `blackboxcommand`.
 
 ```bash
 $ qcsv '-1 .h.cd massage .csv.read `data.csv;' | blackboxcommand
 ```
 
-Don't forget about the trailing semi-colon if you would like to process the standard input.
+Remember the trailing semi-colon if you want to process the standard input.
 
 ## Exotic functions
-**qSQL is the superset of ANSI SQL**. This means that with our one-liner `qcsv` we can express complex logic that ANSI SQL cannot handle. Furthermore, qSQL is the subset of the q programming language. We can employ all features, libraries and functions of q to further massage a CSV file. These include vector operations, functional programming, advanced iterators, date/time and string manipulation, etc.
+**qSQL is a superset of ANSI SQL**. With our one-liner `qcsv` we can express complex logic that ANSI SQL cannot handle. Furthermore, qSQL is just a part of the q programming language. All the features, libraries and functions of q are available to further massage a CSV file. These include vector operations, functional programming, advanced iterators, date/time and string manipulation, etc.
 
 Furthermore, we can load the business logic that we use in production. **It is like employing the stored procedures of our DBMS to analyze a local CSV. Kdb+ provides a single solution for streaming, in-memory, historic data processing that you can also leverage in your ad hoc data analyses.**
 
-The possibilities do not end here. Besides, loading existing scripts, you can also connect to existing kdb+ services easily. For example to evoke q function `fn` on a remote kdb+ server at e.g. `72.7.9.248:5001` with parameter of the content of the CSV, you can use make use of the one-shot TCP request.
+The possibilities do not end here. Besides loading existing scripts you can also connect to existing kdb+ services easily. For example to evoke q function `fn` on a remote kdb+ server at e.g. `72.7.9.248:5001` with parameter of the content of the CSV, you can use make use of the [one-shot](https://code.kx.com/q/basics/ipc/#sync-request-get) TCP request.
 
 ```bash
 qcsv '`:72.7.9.248:5001 (`fn; .csv.read `data.csv)'
 ```
 
-With kdb+ you get the full flexibility to plug scripts and services into a one-liner to process a CSV file. Simple and powerful, right?
+With kdb+ you get full flexibility to plug scripts and services into a one-liner to process a CSV file. Simple and powerful, right?
 
-Let us examine three areas to get a feel of how far you can go in analyzing CSV files.
+Let us examine three areas to get a feel for how far you can go in analyzing CSV files.
 
 ### Pivot
-Pivoting a table is a frequently used function in data analyses. It provides a more compact view of the data by transforming column values to new columns. The new view allows for examining related values side-by-side. The technique is often used to visualize the output of aggregation with multiple grouping.
+Pivoting a table is a frequently-used function in data analyses. It provides a more compact view of the data by transforming column values to new columns. The new view allows for examining related values side-by-side. The technique is often used to visualize the output of aggregation with multiple grouping.
 
-I put some  wrapper function around when most [wide-spread pivot implementation](https://code.kx.com/q/kb/pivoting-tables/#a-very-general-pivot-function-and-an-example) into `utils/pivots.q`. All we need is to load library `pivot.q` and prepend `.pvt.pivotSingle`. It requires a [keyed table](https://code.kx.com/q4m3/8_Tables/#84-primary-keys-and-keyed-tables) , typically the result of an aggregation with multiple group bys. The pivot column is the last key column. See how pivotting converts a narrow, hard to digest table to a square shaped format that nicely fits the console.
+I put a wrapper function around when most [wide-spread pivot implementation](https://code.kx.com/q/kb/pivoting-tables/#a-very-general-pivot-function-and-an-example) into `utils/pivots.q`. All we need is to load library `pivot.q` and prepend `.pvt.pivotSingle`. It requires a [keyed table](https://code.kx.com/q4m3/8_Tables/#84-primary-keys-and-keyed-tables) , typically the result of an aggregation with multiple group-bys. The pivot column is the last key column. See how pivotting converts a narrow, hard-to-digest table to a square-shaped format that nicely fits the console.
 
 ![pivot](pic/pivot.png)
 
 ### Array columns
-Nothing prevents you technically to put a list of values into a cell of a CSV. You just need to use a separator other than a comma, e.g. whitespace or semicolon. Unlike ANSI SQL, kdb+ can handle array columns.
+Nothing prevents you putting a list of values into a cell of a CSV. You just need to use a separator other than a comma, e.g. whitespace or semicolon. Unlike ANSI SQL, kdb+ can handle array columns.
 
-We already used function [.h.cd](https://code.kx.com/q/ref/doth/#hcd-csv-from-data) co convert a kdb+ table to a list of strings before saving that to a CSV. `.h.cd` handles array columns as expected. You can set the secondary delimiter via [.h.d](https://code.kx.com/q/ref/doth/#hd-delimiter). Bear in mind that a string in q is a list thus `.h.cd` will insert spaces between the characters. It is simpler to use operator [0:](https://code.kx.com/q/ref/file-text/#prepare-text) if the table contains string columns but not list of other types.
+We already used function [.h.cd](https://code.kx.com/q/ref/doth/#hcd-csv-from-data) to convert a kdb+ table to a list of strings before saving that to a CSV. `.h.cd` handles array columns as expected. You can set the secondary delimiter via [.h.d](https://code.kx.com/q/ref/doth/#hd-delimiter). Bear in mind a string in q is a list thus `.h.cd` will insert spaces between the characters. It is simpler to use operator [0:](https://code.kx.com/q/ref/file-text/#prepare-text) if the table contains string columns but not list of other types.
 
 When reading the array column of a CSV it will be stored as a string column. Kdb+ function [vs](https://code.kx.com/q/ref/vs/) (that abbreviates **v**ector from **s**tring) splits a string by a separator string.
 
@@ -225,13 +225,13 @@ q)" " vs "10 31 -42"
 
 You can convert a list of strings to a list of integers by integer cast, denoted by `"I"$`.
 
-Like many functions in kdb+, `vs` can be either used in infix notation or as normal function.
+Like many functions in kdb+, `vs` can be used with either infix or bracket notation.
 
 ```
 q) vs[" "; "10 31 -42"]
 ```
 
-kdb+ supports functional programming. You can easily apply a monadic function to a list via the `each` operator. This is similar to Python's function `map`. Furthermore you can derive a monadic function from a dyadic function by binding a parameter. This is called [projection](https://code.kx.com/q4m3/6_Functions/#64-projection) in kdb+ nomenclature. Putting this together we can split a list of strings by a whitespace as per
+Kdb+ supports functional programming. You can easily apply a unary function to a list with `each`. This is similar to Python's `map` function. Furthermore you can derive a unary function from a binary function by binding a parameter. This is called [projection](https://code.kx.com/q4m3/6_Functions/#64-projection). Putting this together we can split a list of strings by a whitespace as per
 
 ```
 q) vs[" "] each ("10 31 -42"; "104 105 107")
@@ -239,21 +239,21 @@ q) vs[" "] each ("10 31 -42"; "104 105 107")
 "104" "105" "107"
 ```
 
-or more elegantly with operator `each both` (denoted by `'`) if the separator is a single character
+or more elegantly with the Each iterator (denoted by `'`) if the separator is a single character.
 
 ```
 q) " " vs' ("10 31 -42"; "104 105 107")
 ```
 
-It is not a problem if the list of string is given as a column of a table. Let us assume that column `A` contains whitespace separated integers. Function `.csv.read` returns string column that we can easily convert to an array column.
+A table column can be a list of strings. Suppose column `A` contains whitespace-separated integers. Function `.csv.read` returns a string column that we can easily convert to an array column.
 
 ```
 q) update "I"$" " vs' A from .csv.read `data.csv
 ```
 
-Just to illustrate the power of the q language, let us assume that `data.csv` contains another array column called `IDX` and contains indices. For each row we need to calculate the sum of array column `A` restricted to the indices specified by `IDX`. Let me delve inside indexing a little bit.
+Just to illustrate the power of the q language, suppose `data.csv` has another array column called `IDX` containing indices. For each row, we need to calculate the sum of array column `A` restricted to the indices specified by `IDX`. Let me delve inside indexing a little bit.
 
-In kdb+ you can index a list the same way as you do in other programing language
+In q you can index a list the same way as you do in other programing language.
 
 ```
 q) l: 4 1 6 3    // this is an integer list
@@ -261,21 +261,21 @@ q) l[2]
 6
 ```
 
-kdb+ is a vector language. Many operations accepts not only scalars but lists as well. Indexing is such an operation.
+Q is a vector language. Many operators accept not only scalars but lists as well. Indexing is such an operation.
 
 ```
 q) l[2 1]
 6 1
 ```
 
-The square brackets are just syntactic sugar, you can also use the `@` operator with infix notation
+The square brackets are just syntactic sugar. You can instead use the `@` operator with infix notation.
 
 ```
 q) l @ 2 1
 6 1
 ```
 
-If we pass list of lists to both sides of the `@` operator then we need the `each both` construct again. Putting all together, we add new column `sum_A_of` by
+If we pass a list of lists as both arguments of the `@` operator then we need the Each iterator again. Putting it all together, we add new column `sum_A_of` by
 
 
 ```bash
@@ -286,16 +286,16 @@ update sum_A_of: sum each A@\'IDX from t'
 
 ![operations on array columns](pic/array.png)
 
-I split the expression to multiple lines for readability, but from the shell's perspective it is still a single command.
+I split the expression into multiple lines for readability, but from the shell’s perspective it is still a single command.
 
-The each-both operator (`'`) needs to be escaped and we need to use ANSI-C quoting, hence the `$` before the opening quotation mark.
+The Each iterator (`'`) needs to be escaped and we need to use ANSI-C quoting, hence the `$` before the opening quotation mark.
 
 ### Join
-Joining two CSV files already supported by Linux command `join`. Command `csvjoin` goes further and support all types of SQL joins inner, left, right and outer. kdb+ also supports these classic join operations.
+Joining two CSV files is already supported by Linux command `join`. Command `csvjoin` goes further and supports all types of SQL joins: inner, left, right and outer. Q also supports these classic join operations.
 
-For time series there is another type of joins that are frequently used. This is called [asof](https://code.kx.com/q/ref/asof/) and its generalization [window join](https://code.kx.com/q/ref/wj/). If you have two streams of data and the times are different then asof join can merge the two streams.
+For timeseries another type of join is frequently used. This is called [asof](https://code.kx.com/q/ref/asof/) and its generalization [window join](https://code.kx.com/q/ref/wj/). If you have two streams of data and the times are different then asof join can merge the two streams.
 
-Let me demonstrate the usage of window join in a real-life scenario to profile distributed processes. Our main process sends request to worker processes. Each request results in multiple tasks. We store the `start` and `end` times of the requests and the `start` times and `duration` of the tasks. We would like to see the ratio of times the worker devoted to each request. Due to network delay start time of a task happens after the start time of a request. An example of the main process data is below.
+Let me demonstrate the usage of window join in a real-life scenario to profile distributed processes. Our main process sends request to worker processes. Each request results in multiple tasks. We store the `start` and `end` times of the requests and the `start` times and `duration` of the tasks. We would like to see the ratio of times the worker devoted to each request. Due to network delay, the start time of a task follows the start time of a request. An example of the main process’ data is below.
 
 | requestID | workerID | start | end |
 | ---: | ---: | ---: | ---: |
@@ -319,7 +319,7 @@ And merged workers data is
 |SL3|2|12:58|1|
 |SL1|6|13:10|2|
 
-Function `wj1` helps finding the tasks with given workerID values that happened within a time window specified by the main table's start and end columns.
+Function `wj1` helps find the tasks with given workerID values that fall within a time window specified by the main table's `start` and `end` columns.
 
 ```
 q) m: .csv.read `main.csv
@@ -334,9 +334,9 @@ requestID workerID start end   taskID
 5         sl1     13:10 13:13 ,6h
 ```
 
-Character `h` at the end of the integer list in column `taskID` denotes the short modifier, i.e. the integer is stored in one byte. Function `.csv.info` try to save memory and use the integer and floating point representation that requires the least space while preserving all information.
+Character `h` at the end of the integer list in column `taskID` denotes the _short_ datatype, i.e. an integer is stored in one byte. Function `.csv.info` tries to save memory and use the integer and floating-point representation that requires the least space while preserving all information.
 
-To get the ratio, we need to work with elapsed times
+To get the ratio, we need to work with elapsed times.
 
 ```
 q) select requestID, rate: duration % end-start from
@@ -347,13 +347,13 @@ q) select requestID, rate: duration % end-start from
 ![advanced join operation](pic/windowjoin.png)
 
 ## Performance
-Let us compare the performance of executing a simple aggregation on publicly available CSV also used in benchmarking the `xsv` package. The 145 MByte file contains almost 32 million lines.
+Let us compare the performance of executing a simple aggregation on publicly available CSV used in benchmarking the `xsv` package. The 145 MByte file contains nearly 32 million lines.
 
 ```bash
 $ curl -LO https://burntsushi.net/stuff/worldcitiespop.csv
 ```
 
-We would like to see the top 10 regions by population. We need to sum the population of the cities of each region. Package xsv does not support aggregation thus it is out of the game.
+We would like to see the top 10 regions by population. We need to sum the population of the cities of each region. Package xsv does not support aggregation, so it is out of the game.
 
 The q query is simple.
 
@@ -373,7 +373,7 @@ The `csvsql` is quite similar
 $ csvsql --query "select Region, SUM(Population) AS Population FROM worldcitiespop GROUP BY Region ORDER BY Population DESC LIMIT 10" worldcitiespop.csv
 ```
 
-There are several other open source tools that were built to run SQL statements on CSV files. I also evaluated two packages that were written in GO.
+Several other open-source tools run SQL statements on CSV files. I also evaluated two packages written in Go.
 
 ```bash
 $ textql -header -sql "select Region, SUM(Population) AS Population FROM worldcitiespop GROUP BY Region ORDER BY Population DESC LIMIT 10" worldcitiespop.csv
@@ -386,9 +386,9 @@ The run times in seconds are displayed below. The second row corresponds to the 
 | 220 | 23 | 13 | 2 |
 | OUT OF MEM | 102 | OUT OF MEM | 6 |
 
-kdb+ is famous for its stunning speed. Benchmarks tend to focus on data that resides either in-memory or on disk using its proprietary format. CSV support is a useful feature of the language. However, the extreme optimization, the support of vector operations and the inherent parallelization pays off: kdb+ significantly outperforms tools purpose-built for CSV analysis. The execution speed translates directly to productivity. How much does it cost you if the query returns in almost 4 minutes instead of 2 seconds? What do developers do if repeatedly interrupted by minutes-long wait phases?
+Kdb+ is famous for its stunning speed. Benchmarks tend to focus on data that resides either in-memory or on disk using its proprietary format. CSV support is a useful feature of the language. However, the extreme optimization, the support of vector operations and the inherent parallelization pays off: kdb+ significantly outperforms tools purpose-built for CSV analysis. The execution speed translates directly to productivity. How much does it cost you if the query returns in almost 4 minutes instead of 2 seconds? What do developers do if repeatedly interrupted by minutes-long wait phases?
 
-The test run on a `n1-standard-4` GCP virtual machine. The run times of the kdb+ based solution would further drop with machines of more cores, as kdb+ 4 could better make use of the [multithreaded primitives](https://code.kx.com/q/kb/mt-primitives/).
+The test ran on a `n1-standard-4` GCP virtual machine. The run times of the kdb+ solution would further drop with machines of more cores, as kdb+ 4.0 makes use of [multithreaded primitives](https://code.kx.com/q/kb/mt-primitives/).
 
 ## Conclusion
-Many tools out there to process CSV files. kdb+ has an excellent open source library `csvutil.q`/`csvguess.q` with a sophisticated type inference engine. Once you converted CSV into a kdb+ in-memory table, you can easily cope with problems other tools handle only with difficulty - if at all. You can express complex logic in a readable way that is easy to maintain and executes fast simply by wrapping the q interpreter that loads the library into a shell function.
+Many tools out there to process CSV files. Kdb+ has an excellent open source library `csvutil.q`/`csvguess.q` with a sophisticated type-inference engine. Once you convert CSV into a kdb+ in-memory table, you can easily cope with problems other tools handle only with difficulty - if at all. You can express complex logic in a readable way that is easy to maintain and executes fast simply by wrapping the q interpreter that loads the library into a shell function.
