@@ -4,9 +4,9 @@ Comma-separated text files (CSV) are the most fundamental format for data proces
 
 The CSV format predates personal computers and has been one of the most common data exchange format for almost 50 years. CSV files will remain with us in the future. Working with this format efficiently is a core requirement of a productive developer, data engineer, DevOps person, etc…
 
-In this article I review available tools to process CSV files and then show how kdb+ and its query language q raise CSV processing to a new level of performance and simplicity.
+In this article, I review available tools to process CSV files and then show how kdb+ and its query language q raise CSV processing to a new level of performance and simplicity.
 
-## Linux command line tools
+## Linux command-line tools
 Linux shells, like Bash, support arrays. You can read a CSV line-by-line and store all fields in an array variable. You can use built-in string manipulation and integer calculations (even float calculations with e.g `bc -l`) to operate on cell values. The code will be lengthy and hard to maintain.
 
 General text processing tools like [`awk`](https://en.wikipedia.org/wiki/AWK) and [`sed`](https://en.wikipedia.org/wiki/Sed) scripts may result in shorter and simpler code. Commands like [`cut`](https://en.wikipedia.org/wiki/Cut_(Unix)), [`sort`](https://en.wikipedia.org/wiki/Sort_(Unix)), [`uniq`](https://en.wikipedia.org/wiki/Uniq) and [`paste`](https://en.wikipedia.org/wiki/Paste_(Unix)) further simplify CSV processing. You can specify the separator and **refer to fields by positions**.
@@ -17,19 +17,19 @@ Position-based reference creates fragile code. Processing CSV by these Linux com
 
 You can **refer to a column by name**. The column names are stored in the first row of the CSV. Reference by name is sensitive to column renaming but this probably happens less frequently than adding or reshuffling columns.
 
-The huge advantage of Linux command-line tools is that no installation is required. Your shell script will likely run on other's Linux systems. Get familiar with Linux tools but refrain from using them in complex tasks. Remember that the separator is specified by `-t` command line option for [`sort`](https://en.wikipedia.org/wiki/Sort_(Unix)) and `-d` for the other commands, [`cut`](https://en.wikipedia.org/wiki/Cut_(Unix)), [`paste`](https://en.wikipedia.org/wiki/Paste_(Unix)).
+The huge advantage of Linux command-line tools is that no installation is required. Your shell script will likely run on other's Linux systems. Get familiar with Linux tools but refrain from using them in complex tasks. Remember that the separator is specified by `-t` command-line option for [`sort`](https://en.wikipedia.org/wiki/Sort_(Unix)) and `-d` for the other commands, [`cut`](https://en.wikipedia.org/wiki/Cut_(Unix)), [`paste`](https://en.wikipedia.org/wiki/Paste_(Unix)).
 
 ## CSVKit
 
 Many open-source libraries on GitHub offer CSV support. Python library [CSVKit](https://csvkit.readthedocs.io/en/latest/#) is one of the most popular. It offers a more robust solution than native Linux commands. Most importantly, CSVKit commands allow reference by column name.
 
-Also they handle the first rows better than the general-purpose text tools do. Linux command `sort` treats the first row as any other row and can place it in the middle of the output. Similarly `cat` includes the first rows when you concatenate multiple CSV files. Commands `csvsort` and `csvstack` handle first rows as properly.
+Also, they handle the first rows better than the general-purpose text tools do. Linux command `sort` treats the first row as any other row and can place it in the middle of the output. Similarly, `cat` includes the first rows when you concatenate multiple CSV files. Commands `csvsort` and `csvstack` handle first rows as properly.
 
-Finally, the CSVKit developers took special care to provide consistent command line parameters, e.g. separator is defined by `-d`.
+Finally, the CSVKit developers took special care to provide consistent command-line parameters, e.g. separator is defined by `-d`.
 
 The naming is coherent, [`csvcut`](https://csvkit.readthedocs.io/en/latest/scripts/csvcut.html), [`csvgrep`](https://csvkit.readthedocs.io/en/latest/scripts/csvgrep.html) and [`csvsort`](https://csvkit.readthedocs.io/en/latest/scripts/csvsort.html) replace traditional Linux commands `cut`, `grep` and `sort`. Nonetheless, the merit of the Linux commands is their speed, probably because they were written in C.
 
-You probably use Linux commands [`head`](https://en.wikipedia.org/wiki/Head_(Unix)), [`tail`](https://en.wikipedia.org/wiki/Tail_(Unix)), [`less`](https://en.wikipedia.org/wiki/Less_(Unix))/[`more`](https://en.wikipedia.org/wiki/More_(command)) and [`cat`](https://en.wikipedia.org/wiki/Cat_(Unix)) to take a quick look at the content of a text file. Unfortunately the output of these tools is not appealing for CSV files. The columns are not aligned and you will spend a lot of time squinting a monochrome screen figuring out to which column a given cell belongs. You might give up and import the data into Excel or Google Sheet. However if the file is on a remote machine you first need to SCP it to your desktop. You can save time and work in the console by using [`csvlook`](https://csvkit.readthedocs.io/en/latest/scripts/csvlook.html). Command `csvlook` nicely aligns column under the column name.
+You probably use Linux commands [`head`](https://en.wikipedia.org/wiki/Head_(Unix)), [`tail`](https://en.wikipedia.org/wiki/Tail_(Unix)), [`less`](https://en.wikipedia.org/wiki/Less_(Unix))/[`more`](https://en.wikipedia.org/wiki/More_(command)) and [`cat`](https://en.wikipedia.org/wiki/Cat_(Unix)) to take a quick look at the content of a text file. Unfortunately, the output of these tools is not appealing for CSV files. The columns are not aligned and you will spend a lot of time squinting a monochrome screen figuring out to which column a given cell belongs. You might give up and import the data into Excel or Google Sheet. However, if the file is on a remote machine you first need to SCP it to your desktop. You can save time and work in the console by using [`csvlook`](https://csvkit.readthedocs.io/en/latest/scripts/csvlook.html). Command `csvlook` nicely aligns column under the column name.
 
 ```bash
 $ csvlook --max-rows 20 data.csv
@@ -45,11 +45,11 @@ To perform aggregations, filtering and grouping, you can use the generic command
 
 Some CSVKit commands are slow because they load the entire file into the memory and create an in-memory database. Rust developers reimplemented several traditional tools like `cat`, `ls`, `grep` and `find` and tools like [`bat`](https://github.com/sharkdp/bat), [`exa`](https://github.com/ogham/exa), [`ripgrep`](https://github.com/BurntSushi/ripgrep) and [`fd`](https://github.com/sharkdp/fd) were born. No wonder they also created a performant tool for CSV processing, library [`xsv`](https://github.com/BurntSushi/xsv).
 
-The library also supports selecting column, filtering, sorting and joining CSV. An index can be added to CSV files that are frequently processed to speed up operations. It is an elegant and lightweight step towards DBMS.
+The library also supports selecting columns, filtering, sorting and joining CSV. An index can be added to CSV files that are frequently processed to speed up operations. It is an elegant and lightweight step towards DBMS.
 
 
 ## Type inference
-CSV is a text file, and holds no type information for the columns. A string can be converted to a datatype based on its value. If all values of a column matches the pattern `YYYY.MM.DD` we can conclude that the column holds date. But how shall we treat the literal 100000? Is it an integer, or a time 10:00:00? Maybe the source process only supports digits and omitted the time separators? In real life, information about the source is not always available and you need to reverse engineer the data. If all values of the column matches `HHMMSS` string then we **can** conclude with high confidence that the column holds time values. We can follow two approaches to make a decision.
+CSV is a text file and holds no type information for the columns. A string can be converted to a datatype based on its value. If all values of a column matches the pattern `YYYY.MM.DD` we can conclude that the column holds dates. But how shall we treat the literal 100000? Is it an integer, or a time 10:00:00? Maybe the source process only supports digits and omitted the time separators? In real life, information about the source is not always available and you need to reverse engineer the data. If all values of the column match `HHMMSS` string then we **can** conclude with high confidence that the column holds time values. We can follow two approaches to make a decision.
 
 First, we could be strict, i.e. we predefine the pattern that any type needs to match. The patterns do not overlap. If time is defined as `HH:MM:SS` and integers as `[1-9][0-9]*` then 100000 is an integer.
 
@@ -110,7 +110,7 @@ The column meta-data table is a bit similar to `csvstat` output.
 
 ![CSV meta-information by csvinfo](pic/csvinfo.png)
 
-Each row belongs to a column and each field stores some useful information about the column, like name (`c`), inferred type (`t`), max width (`mw`), etc. Field `gr` short for *granularity* is particularly interesting as it gives hint how well the column values compresses and if it should be stored as enumeration (symbol in kdb+ parlance) rather than as string.
+Each row belongs to a column and each field stores some useful information about the column, like name (`c`), inferred type (`t`), max width (`mw`), etc. Field `gr` short for *granularity* is particularly interesting as it gives hint how well the column values compresses and if it should be stored as enumeration (symbol in kdb+ parlance) rather than as strings.
 
 You can control the number of lines to be examined for type inference by variable `READLINES`. The default value is 5555. The smaller this number the more chance of an inference rule to be coincidental. For example in sample table (that was also used in CSVKit tutorial) column `fips` matches the patter `HMMSS` for the first 916 rows, so we could infer time as type. The patter matching breaks from line 917 with values like `31067`. To disable partial file-based type inference, just change `READLINES`.
 
@@ -126,7 +126,7 @@ Let us wrap the q interpreter and the load of `csvutil.q` into a simple shell fu
 $ function qcsv { q -c 25 320 -s $(nproc --all) <<< 'system "l utils/csvutil.q";'"$1"; }
 ```
 
-The `-c 25 320` command line parameter modifies the default 25×80 console size to display wide tables better. Switch `-s` allocates multiple threads for parallel processing. We set this value to the number of cores in your machine. Use `$(sysctl -n hw.ncpu)` if you work on a Mac. You can verify the setting by executing
+The `-c 25 320` command-line parameter modifies the default 25×80 console size to display wide tables better. Switch `-s` allocates multiple threads for parallel processing. We set this value to the number of cores in your machine. Use `$(sysctl -n hw.ncpu)` if you work on a Mac. You can verify the setting by executing
 
 ```
 $ qcsv 'system "s"'
@@ -205,7 +205,7 @@ Let us examine three areas to get a feel for how far you can go in analyzing CSV
 ### Pivot
 Pivoting a table is a frequently-used function in data analyses. It provides a more compact view of the data by transforming column values to new columns. The new view allows for examining related values side-by-side. The technique is often used to visualize the output of aggregation with multiple grouping.
 
-I put a wrapper function around when most [wide-spread pivot implementation](https://code.kx.com/q/kb/pivoting-tables/#a-very-general-pivot-function-and-an-example) into `utils/pivots.q`. All we need is to load library `pivot.q` and prepend `.pvt.pivotSingle`. It requires a [keyed table](https://code.kx.com/q4m3/8_Tables/#84-primary-keys-and-keyed-tables) , typically the result of an aggregation with multiple group-bys. The pivot column is the last key column. See how pivotting converts a narrow, hard-to-digest table to a square-shaped format that nicely fits the console.
+I put a wrapper function around when most [wide-spread pivot implementation](https://code.kx.com/q/kb/pivoting-tables/#a-very-general-pivot-function-and-an-example) into `utils/pivots.q`. All we need is to load library `pivot.q` and prepend `.pvt.pivotSingle`. It requires a [keyed table](https://code.kx.com/q4m3/8_Tables/#84-primary-keys-and-keyed-tables) , typically the result of an aggregation with multiple group-bys. The pivot column is the last key column. See how pivoting converts a narrow, hard-to-digest table to a square-shaped format that nicely fits the console.
 
 ![pivot](pic/pivot.png)
 
