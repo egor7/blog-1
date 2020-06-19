@@ -84,7 +84,7 @@ Specifying types manually has high maintenance costs, is laborious for wide CSV 
 
 Fortunately, Kx open-source libraries [csvutil](https://github.com/KxSystems/kdb/blob/master/utils/csvutil.q) and [csvguess](https://github.com/KxSystems/kdb/blob/master/utils/csvguess.q) offer a convenient and robust solution.
 
-Scripts `csvutil.q` contains function to load a CSV file, analyzes its values, infers types and return a kdb+ table.
+Script `csvutil.q` contains a function to load a CSV file, analyze its values, infer types and return a kdb+ table.
 
 ```
 q) \l utils/csvutil.q
@@ -93,7 +93,7 @@ q) .csv.read `data.csv
 
 ![displaying CSV content by .csv.read](pic/csvread.png)
 
-Scripts `csvguess.q` allows saving a meta-information about the columns. Developers can review and adjust the type column and use the meta-data in production to load CSV with proper type. The two scripts have different users. Data scientists prefer `csvutil.q` for ad hoc analyses. When IT staff configure a kdb+ CSV feed then they use assisted meta-data export and import feature of `csvguess.q`. The type hints provide a less error prone solution than manually entering types for all columns.
+Script `csvguess.q` lets you save a metadata about the columns. Developers can review and adjust the type column and use the metadata in production to load a CSV with correct types. The two scripts have different users. Data scientists prefer `csvutil.q` for ad hoc analyses. When IT staff configure a kdb+ CSV feed then they use the assisted metadata export and import feature of `csvguess.q`. The type hints provide a less error-prone solution than manually entering types for all columns.
 
 ### Type conversion
 
@@ -134,13 +134,13 @@ $ qcsv 'system "s"'
 
 to display the number of worker threads allocated for `qcsv`.
 
-This simple wrapper can easily achieve what csvlook, csvcut, csvgrep and csvsort are built for... and even more. For example,
+This simple wrapper can easily achieve what `csvlook`, `csvcut`, `csvgrep` and `csvsort` are built for… and even more. For example,
 
 ```bash
 $ qcsv '.csv.read10 `data.csv'
 ```
 
-mocks `csvlook` and displays nicely aligned the first 10 rows of `data.csv`. You can pipe the output to `less -S` for wide tables.
+mocks `csvlook` and displays the first 10 rows of `data.csv` nicely aligned. You can pipe the output to `less -S` for wide tables.
 
 ![qcsv mocks csvlook](pic/qmockscsvlook.png)
 
@@ -151,15 +151,15 @@ $ qcsv '20 sublist .csv.read `data.csv'
 ```
 
 ### Filtering, selecting columns, sorting
-Once we have a kdb+ table, we can use the full power of q-sql to do any data manipulation. To select columns
+Once we have a kdb+ table, we can use the full power of qSQL to do any data manipulation. To select columns
 
 ```bash
 $ qcsv 'select nsn,item_name from .csv.read `data.csv'
 ```
 
-If you are the type of person who has bad feelings for devoting resources to analyze columns (and load into memory) that we throw away. Good news, we can do a shortcut.
+Perhaps, you dislike the idea of devoting resources to analyze columns, load them into memory, then discard them. Good news! We have a shortcut.
 
-In kdb+, function `.csv.infoonly` accepts a list of columns to restrict the column analyses. We can plug the output to the generic `.csv.read`.
+In kdb+, function `.csv.infoonly` accepts a list of columns to restrict the column analyses. We can plug the output into the generic `.csv.read`.
 
 ```
 $ qcsv '.csv.data[`data.csv; .csv.infoonly[`data.csv; `nsn`item_name]]'
@@ -177,9 +177,9 @@ We can use q keywords `xasc` and `xdesc` to mock `csvsort`.
 $ qcsv '`fips xdesc .csv.read `data.csv'
 ```
 
-A fantastic feature of the Unix based system is piping. You can feed output of a command as input of another command. CSVKit also follows this principle. Once the content of a CSV is converted to a kdb+ table, you probably don't want to leave this place as the power of q offers a convenient data processing environment.
+A fantastic feature of the Unix-based system is piping: pass the output from a command as the input to another command. CSVKit also follows this principle. Once the content of a CSV is converted to a kdb+ table, you probably want to stay in this place as the power of q offers a convenient and powerful data-processing environment.
 
-In real life, however, it can happen that you need to execute a black box script that accepts the input via STDIN. Our `qcsv` command can convert a kdb+ table to produce the required output. For example, in command below we massage the input CSV via q function `massage` then send the output to command `blackboxcommand`.
+In real life, however, it can happen that you need to execute a black-box script that accepts the input via STDIN. Our `qcsv` command can convert a kdb+ table to produce the required output. For example, in command below we massage the input CSV via q function `massage` then send the output to command `blackboxcommand`.
 
 ```bash
 $ qcsv '-1 .h.cd massage .csv.read `data.csv;' | blackboxcommand
@@ -188,7 +188,7 @@ $ qcsv '-1 .h.cd massage .csv.read `data.csv;' | blackboxcommand
 Don't forget about the trailing semi-colon if you would like to process the standard input.
 
 ## Exotic functions
-**q-sql is the superset of ANSI SQL**. This means that with our one-liner `qcsv` we can express complex logic that ANSI SQL cannot handle. Furthermore, q-sql is the subset of the q programming language. We can employ all features, libraries and functions of q to further massage a CSV file. These include vector operations, functional programming, advanced iterators, date/time and string manipulation, etc.
+**qSQL is the superset of ANSI SQL**. This means that with our one-liner `qcsv` we can express complex logic that ANSI SQL cannot handle. Furthermore, qSQL is the subset of the q programming language. We can employ all features, libraries and functions of q to further massage a CSV file. These include vector operations, functional programming, advanced iterators, date/time and string manipulation, etc.
 
 Furthermore, we can load the business logic that we use in production. **It is like employing the stored procedures of our DBMS to analyze a local CSV. Kdb+ provides a single solution for streaming, in-memory, historic data processing that you can also leverage in your ad hoc data analyses.**
 
