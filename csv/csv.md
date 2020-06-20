@@ -93,7 +93,7 @@ q) .csv.read `data.csv
 
 ![displaying CSV content by .csv.read](pic/csvread.png)
 
-Script `csvguess.q` lets you save a metadata about the columns. Developers can review and adjust the type column and use the metadata in production to load a CSV with correct types. The two scripts have different users. Data scientists prefer `csvutil.q` for ad hoc analyses. When IT staff configure a kdb+ CSV feed then they use the assisted metadata export and import feature of `csvguess.q`. The type hints provide a less error-prone solution than manually entering types for all columns.
+Script `csvguess.q` lets you save a metadata about the columns into a text file. Developers can review and adjust the type column and use the metadata in production to load a CSV with correct types. The two scripts have different users. Data scientists prefer `csvutil.q` for ad hoc analyses. When IT staff configure a kdb+ CSV feed then they use the assisted metadata export and import feature of `csvguess.q`. The type hints provide a less error-prone solution than manually entering types for all columns.
 
 ### Type conversion
 
