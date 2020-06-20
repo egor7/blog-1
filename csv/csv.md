@@ -205,14 +205,14 @@ Let us examine three areas to get a feel for how far you can go in analyzing CSV
 ### Pivot
 Pivoting a table is a frequently-used function in data analyses. It provides a more compact view of the data by transforming column values to new columns. The new view allows for examining related values side-by-side. The technique is often used to visualize the output of aggregation with multiple grouping.
 
-I put a wrapper function around when most [wide-spread pivot implementation](https://code.kx.com/q/kb/pivoting-tables/#a-very-general-pivot-function-and-an-example) into `utils/pivots.q`. All we need is to load library `pivot.q` and prepend `.pvt.pivotSingle`. It requires a [keyed table](https://code.kx.com/q4m3/8_Tables/#84-primary-keys-and-keyed-tables) , typically the result of an aggregation with multiple group-bys. The pivot column is the last key column. See how pivoting converts a narrow, hard-to-digest table to a square-shaped format that nicely fits the console.
+I put a wrapper function around when most [wide-spread pivot implementation](https://code.kx.com/q/kb/pivoting-tables/#a-very-general-pivot-function-and-an-example) into `utils/pivots.q`. All we need is to load library `pivot.q` and prepend `.pvt.pivotSingle`. It requires a [keyed table](https://code.kx.com/q4m3/8_Tables/#84-primary-keys-and-keyed-tables), typically the result of aggregation with multiple group-bys. The pivot column is the last key column. See how pivoting converts a narrow, hard-to-digest table to a square-shaped format that nicely fits the console.
 
 ![pivot](pic/pivot.png)
 
 ### Array columns
 Nothing prevents you putting a list of values into a cell of a CSV. You just need to use a separator other than a comma, e.g. whitespace or semicolon. Unlike ANSI SQL, kdb+ can handle array columns.
 
-We already used function [.h.cd](https://code.kx.com/q/ref/doth/#hcd-csv-from-data) to convert a kdb+ table to a list of strings before saving that to a CSV. `.h.cd` handles array columns as expected. You can set the secondary delimiter via [.h.d](https://code.kx.com/q/ref/doth/#hd-delimiter). Bear in mind a string in q is a list thus `.h.cd` will insert spaces between the characters. It is simpler to use operator [0:](https://code.kx.com/q/ref/file-text/#prepare-text) if the table contains string columns but not list of other types.
+We already used function [.h.cd](https://code.kx.com/q/ref/doth/#hcd-csv-from-data) to convert a kdb+ table to a list of strings before saving that to a CSV. `.h.cd` handles array columns as expected. You can set the secondary delimiter via [.h.d](https://code.kx.com/q/ref/doth/#hd-delimiter). Bear in mind a string in q is a list thus `.h.cd` will insert spaces between the characters. It is simpler to use operator [0:](https://code.kx.com/q/ref/file-text/#prepare-text) if the table contains string columns but not a list of other types.
 
 When reading the array column of a CSV it will be stored as a string column. Kdb+ function [vs](https://code.kx.com/q/ref/vs/) (that abbreviates **v**ector from **s**tring) splits a string by a separator string.
 
@@ -231,7 +231,7 @@ Like many functions in kdb+, `vs` can be used with either infix or bracket notat
 q) vs[" "; "10 31 -42"]
 ```
 
-Kdb+ supports functional programming. You can easily apply a unary function to a list with `each`. This is similar to Python's `map` function. Furthermore you can derive a unary function from a binary function by binding a parameter. This is called [projection](https://code.kx.com/q4m3/6_Functions/#64-projection). Putting this together we can split a list of strings by a whitespace as per
+Kdb+ supports functional programming. You can easily apply a unary function to a list with `each`. This is similar to Python's `map` function. Furthermore, you can derive a unary function from a binary function by binding a parameter. This is called [projection](https://code.kx.com/q4m3/6_Functions/#64-projection). Putting this together we can split a list of strings by whitespaces as per
 
 ```
 q) vs[" "] each ("10 31 -42"; "104 105 107")
@@ -253,7 +253,7 @@ q) update "I"$" " vs' A from .csv.read `data.csv
 
 Just to illustrate the power of the q language, suppose `data.csv` has another array column called `IDX` containing indices. For each row, we need to calculate the sum of array column `A` restricted to the indices specified by `IDX`. Let me delve inside indexing a little bit.
 
-In q you can index a list the same way as you do in other programing language.
+In q you can index a list the same way as you do in other programing languages.
 
 ```
 q) l: 4 1 6 3    // this is an integer list
@@ -286,16 +286,16 @@ update sum_A_of: sum each A@\'IDX from t'
 
 ![operations on array columns](pic/array.png)
 
-I split the expression into multiple lines for readability, but from the shell’s perspective it is still a single command.
+I split the expression into multiple lines for readability, but from the shell’s perspective, it is still a single command.
 
 The Each iterator (`'`) needs to be escaped and we need to use ANSI-C quoting, hence the `$` before the opening quotation mark.
 
 ### Join
-Joining two CSV files is already supported by Linux command `join`. Command `csvjoin` goes further and supports all types of SQL joins: inner, left, right and outer. Q also supports these classic join operations.
+Joining two CSV files is already supported by the Linux command `join`. Command `csvjoin` goes further and supports all types of SQL joins: inner, left, right and outer. Q also supports these classic join operations.
 
 For timeseries another type of join is frequently used. This is called [asof](https://code.kx.com/q/ref/asof/) and its generalization [window join](https://code.kx.com/q/ref/wj/). If you have two streams of data and the times are different then asof join can merge the two streams.
 
-Let me demonstrate the usage of window join in a real-life scenario to profile distributed processes. Our main process sends request to worker processes. Each request results in multiple tasks. We store the `start` and `end` times of the requests and the `start` times and `duration` of the tasks. We would like to see the ratio of times the worker devoted to each request. Due to network delay, the start time of a task follows the start time of a request. An example of the main process’ data is below.
+Let me demonstrate the usage of window join in a real-life scenario to profile distributed processes. Our main process sends requests to worker processes. Each request results in multiple tasks. We store the `start` and `end` times of the requests and the `start` times and `duration` of the tasks. We would like to see the ratio of times the worker devoted to each request. Due to network delay, the start time of a task follows the start time of a request. An example of the main process’ data is below.
 
 | requestID | workerID | start | end |
 | ---: | ---: | ---: | ---: |
@@ -391,4 +391,4 @@ Kdb+ is famous for its stunning speed. Benchmarks tend to focus on data that res
 The test ran on a `n1-standard-4` GCP virtual machine. The run times of the kdb+ solution would further drop with machines of more cores, as kdb+ 4.0 makes use of [multithreaded primitives](https://code.kx.com/q/kb/mt-primitives/).
 
 ## Conclusion
-Many tools out there to process CSV files. Kdb+ has an excellent open source library `csvutil.q`/`csvguess.q` with a sophisticated type-inference engine. Once you convert CSV into a kdb+ in-memory table, you can easily cope with problems other tools handle only with difficulty - if at all. You can express complex logic in a readable way that is easy to maintain and executes fast simply by wrapping the q interpreter that loads the library into a shell function.
+Many tools out there to process CSV files. Kdb+ has an excellent open-source library `csvutil.q`/`csvguess.q` with a sophisticated type-inference engine. Once you convert CSV into a kdb+ in-memory table, you can easily cope with problems other tools handle only with difficulty - if at all. You can express complex logic in a readable way that is easy to maintain and executes fast simply by wrapping the q interpreter that loads the library into a shell function.
