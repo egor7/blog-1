@@ -423,6 +423,8 @@ The `csvsql` is quite similar
 $ csvsql --query "select Region, SUM(Population) AS Population FROM worldcitiespop GROUP BY Region ORDER BY Population DESC LIMIT 10" worldcitiespop.csv
 ```
 
+We can also disable type inference and dialect sniffing by command line options `--no-inference --snifflimit 0`. This speeds up the command execution by a factor of two.
+
 Several other open-source tools run SQL statements on CSV files. I also evaluated two packages written in Go.
 
 ```bash
@@ -433,10 +435,10 @@ The run times in seconds are displayed below. The second row corresponds to the 
 
 | CSVKit | textql | csvq | kdb+ |
 | ---: | ---: | ---: | ---: |
-| 220 | 23 | 13 | 2 |
+| 116 | 23 | 13 | 2 |
 | OUT OF MEM | 102 | OUT OF MEM | 6 |
 
-Kdb+ is famous for its stunning speed. Benchmarks tend to focus on data that resides either in-memory or on disk using its proprietary format. CSV support is a useful feature of the language. However, the extreme optimization, the support of vector operations and the inherent parallelization pays off: kdb+ significantly outperforms tools purpose-built for CSV analysis. The execution speed translates directly to productivity. How much does it cost you if the query returns in almost 4 minutes instead of 2 seconds? What do developers do if repeatedly interrupted by minutes-long wait phases?
+Kdb+ is famous for its stunning speed. Benchmarks tend to focus on data that resides either in-memory or on disk using its proprietary format. CSV support is a useful feature of the language. However, the extreme optimization, the support of vector operations and the inherent parallelization pays off: kdb+ significantly outperforms tools purpose-built for CSV analysis. The execution speed translates directly to productivity. How much does it cost you if the query returns in almost two minutes instead of 2 seconds? What do developers do if repeatedly interrupted by minutes-long wait phases?
 
 The test ran on a `n1-standard-4` GCP virtual machine. The run times of the kdb+ solution would further drop with machines of more cores, as kdb+ 4.0 makes use of [multithreaded primitives](https://code.kx.com/q/kb/mt-primitives/).
 
