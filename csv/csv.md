@@ -438,9 +438,16 @@ The run times in seconds are displayed below. The second row corresponds to the 
 | 116 | 23 | 13 | 2 |
 | OUT OF MEM | 102 | OUT OF MEM | 6 |
 
+The following table contains the memory needs in kbytes
+
+| CSVKit | textql | csvq | kdb+ |
+| ---: | ---: | ---: | ---: |
+| 5224 | 216 | 4343 | 172 |
+
+
 Kdb+ is famous for its stunning speed. Benchmarks tend to focus on data that resides either in-memory or on disk using its proprietary format. CSV support is a useful feature of the language. However, the extreme optimization, the support of vector operations and the inherent parallelization pays off: kdb+ significantly outperforms tools purpose-built for CSV analysis. The execution speed translates directly to productivity. How much does it cost you if the query returns in almost two minutes instead of 2 seconds? What do developers do if repeatedly interrupted by minutes-long wait phases?
 
 The test ran on a `n1-standard-4` GCP virtual machine. The run times of the kdb+ solution would further drop with machines of more cores, as kdb+ 4.0 makes use of [multithreaded primitives](https://code.kx.com/q/kb/mt-primitives/).
 
 ## Conclusion
-Many tools out there to process CSV files. Kdb+ has an excellent open-source library `csvutil.q`/`csvguess.q` with a sophisticated type-inference engine. Once you convert CSV into a kdb+ in-memory table, you can easily cope with problems other tools handle only with difficulty - if at all. You can express complex logic in a readable way that is easy to maintain and executes fast simply by wrapping the q interpreter that loads the library into a shell function.
+Many tools out there to process CSV files. Kdb+ has an excellent open-source library `csvutil.q`/`csvguess.q` with a sophisticated type-inference engine. Once you convert CSV into a kdb+ in-memory table, you can easily cope with problems other tools handle only with difficulty - if at all. You can express complex logic in a readable way, that is easy to maintain, simply by wrapping the q interpreter that loads the library into a shell function. The solution is [greener](https://kx.com/blog/kdb-enables-green-computing/) than alternative approaches as it executes faster and requires smaller amount of memory.
