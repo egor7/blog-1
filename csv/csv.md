@@ -207,7 +207,7 @@ You don't need the `qcsv` wrapper around the q interpreter to run queries.
 $ q db <<< 'select count i by county from t'
 ```
 
-If we have limited hardware resources and the CSV does not fit into the memory, then we can use `csvguess.q` that supports batch loading.
+If we have limited hardware resources and the CSV does not fit into the memory, then we can use `csvguess.q` that supports batch loading and saving.
 
 ```bash
 $ q csvguess.q data.csv -savescript -exit
