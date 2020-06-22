@@ -58,10 +58,10 @@ Second, we could let patterns overlap and in case of conflict we choose the type
 Library CSVKit implements the first approach.
 
 ## kdb+
-Kdb+ natively supports tables that resemble to Pandas/R data frames. Exporting and importing CSV files is part of the core language. Table `t` can be saved by command
+Kdb+ natively supports tables that resemble to Pandas/R data frames. Exporting and importing CSV files is part of the core language. Table `t` can be saved in directory `dir` by command
 
 ```
-q) save `t.csv
+q) save `:dir/t.csv
 ```
 
 To chose a different name, e.g. `output.csv` then use the File Text operator `0:` for saving text and the utility [`.h.cd`](https://code.kx.com/q/ref/doth/#hcd-csv-from-data) to convert a kdb+ table to a list of strings
@@ -186,6 +186,35 @@ $ qcsv '-1 .h.cd massage .csv.read `data.csv;' | blackboxcommand
 ```
 
 Remember the trailing semi-colon if you want to process the standard input.
+
+### Indexing
+The index feature of xsv speeds up queries by creating a binary file with extension `idx` next to the CSV.
+
+```bash
+$ xsv index data.csv
+```
+
+You can get a huge performance improvement if you convert the CSV to the proprietary kdb+ format and you can get further gain if you add indices to  columns you query often. In the command below, I create the kdb+ equivalent of `data.csv` as table `t` in directory `kdb` and apply an index on column `county`
+
+```bash
+$ mkdir db
+$ qcsv '`:db/t/ set .Q.en[hsym `db] update `g#county from .csv.read `data.csv'
+```
+
+You don't need the `qcsv` wrapper around the q interpreter to run queries.
+
+```bash
+$ q db <<< 'select count i by county from t'
+```
+
+If we have limited hardware resources and the CSV does not fit into the memory, then we can use `csvguess.q` that supports batch loading.
+
+```bash
+$ q csvguess.q data.csv -savescript -exit
+$ q data.load.q -bulksave -savedb kdb -savename t -exit
+```
+
+Note that kdb+ is a columnar database and each column has its own file representation. When you run query `select count i by county from t` then only column `county` is read and requires resources. This lets you run queries on tables that do not fit into the memory and `csvsql` fails to run.
 
 ## Exotic functions
 **qSQL is a superset of ANSI SQL**. With our one-liner `qcsv` we can express complex logic that ANSI SQL cannot handle. Furthermore, qSQL is just a part of the q programming language. All the features, libraries and functions of q are available to further massage a CSV file. These include vector operations, functional programming, advanced iterators, date/time and string manipulation, etc.
