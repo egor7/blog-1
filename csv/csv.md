@@ -11,6 +11,7 @@
         - [Type conversion](#type-conversion)
     - [kdb+ based one-liners](#kdb-based-one-liners)
         - [Selecting columns, filtering, sorting](#selecting-columns-filtering-sorting)
+        - [Pipes](#pipes)
         - [Indexing](#indexing)
     - [Exotic functions](#exotic-functions)
         - [Pivot](#pivot)
@@ -99,7 +100,7 @@ To import a CSV `data.csv`, specify the column types and the separator. The foll
 q) ("JFDS* I"; enlist csv) 0:hsym `data.csv
 ```
 
-The type encoding is available on the [kdb+ reference card](https://code.kx.com/q/ref/#datatypes), `I` stands for integer, `J` for long, `D` for date, etc. Use spaces to ignore columns. Character `*` denotes string.
+The type encoding is available on the [kdb+ reference card](https://code.kx.com/q/ref/#datatypes), `I` stands for integer, `J` for long, `D` for date, etc… Use spaces to ignore columns. Character `*` denotes string.
 
 Specifying types manually has high maintenance costs, is laborious for wide CSV files and is prone to error. Inserting a single new column can break the code.
 
@@ -131,7 +132,7 @@ The column meta-data table is a bit similar to `csvstat` output.
 
 ![CSV meta-information by csvinfo](pic/csvinfo.png)
 
-Each row belongs to a column and each field stores some useful information about the column, like name (`c`), inferred type (`t`), max width (`mw`), etc. Field `gr` short for *granularity* is particularly interesting as it gives hint how well the column values compresses and if it should be stored as enumeration (symbol in kdb+ parlance) rather than as strings.
+Each row belongs to a column and each field stores some useful information about the column, like name (`c`), inferred type (`t`), max width (`mw`), etc… Field `gr` short for *granularity* is particularly interesting as it gives hint how well the column values compresses and if it should be stored as enumeration (symbol in kdb+ parlance) rather than as strings.
 
 You can control the number of lines to be examined for type inference by variable `READLINES`. The default value is 5555. The smaller this number the more chance of an inference rule to be coincidental. For example in sample table (that was also used in CSVKit tutorial) column `fips` matches the patter `HMMSS` for the first 916 rows, so we could infer time as type. The patter matching breaks from line 917 with values like `31067`. To disable partial file-based type inference, just change `READLINES`.
 
@@ -198,7 +199,9 @@ We can use q keywords `xasc` and `xdesc` to mock `csvsort`.
 $ qcsv '`fips xdesc .csv.read `data.csv'
 ```
 
-A fantastic feature of the Unix-based system is piping: pass the output from a command as the input to another command. CSVKit also follows this principle. Once the content of a CSV is converted to a kdb+ table, you probably want to stay in this place as the power of q offers a convenient and powerful data-processing environment.
+### Pipes
+
+A remarkable feature of the Unix-based system is piping: pass the output from a command as the input to another command. CSVKit also follows this principle. Once the content of a CSV is converted to a kdb+ table, you probably want to stay in this place as the power of q offers a convenient and powerful data-processing environment.
 
 In real life, however, it can happen that you need to execute a black-box script that accepts the input via STDIN. Our `qcsv` command can convert a kdb+ table to produce the required output. For example, in the command below we massage the input CSV via q function `massage` then send the output to command `blackboxcommand`.
 
@@ -207,6 +210,37 @@ $ qcsv '-1 .h.cd massage .csv.read `data.csv;' | blackboxcommand
 ```
 
 Remember the trailing semi-colon if you want to process the standard input.
+
+Using pipe is the most elegant solution if you would like to run a `csvsql` query on a table that does not fit into the memory, but the query contains a WHERE clause that can be used to reduce the table size. For example, instead of doing
+
+```bash
+$ csvsql --query "select ... FROM data WHERE item_name like "RIFLE*" data.csv
+```
+
+that builds a large in-memory database, you can do
+
+```bash
+$ csvgrep -c item_name -r "RIFLE*" data.csv | csvsql --query "select ... FROM STDIN"
+```
+
+Unfortunately, the capability of the `csvgrep` filtering is limited. You can specify columns and a single value or a regular expression. Even ANSI SQL can express more complex filtering.
+
+Libraries `csvutil.q` and `csvguess.q` offer the full power of the q language in pre-filtering the input table. During batch load function `POSTLOADEACH` gets the input CSV segment and its output will be appended to the final result.
+
+```
+$ qcsv 'POSTLOADEACH: {x where x[`item_name] like "RIFLE*"};
+DATA: (); bulkload[`data.csv; .csv.info[`data.csv]];
+select ... from DATA'
+```
+
+In the q function, you can do anything: use business or utility functions, do mathematics operations, call out to external server, etc…
+
+Function `POSTLOADALL` is executed after the bulk load is finished. This post processing is particularly useful in `csvguess.q`. For example in [NY Street tree data](https://data.cityofnewyork.us/Environment/2015-Street-Tree-Census-Tree-Data/pi5s-9p35
+), several columns (e.g. `root_stone`) contain `Yes/No` values only, that you can easily convert to boolean by
+
+```
+POSTLOADALL: {update `Yes=root_stone from x}
+```
 
 ### Indexing
 The index feature of xsv speeds up queries by creating a binary file with extension `idx` next to the CSV.
