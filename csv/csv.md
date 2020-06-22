@@ -10,7 +10,7 @@
     - [kdb+](#kdb)
         - [Type conversion](#type-conversion)
     - [kdb+ based one-liners](#kdb-based-one-liners)
-        - [Filtering, selecting columns, sorting](#filtering-selecting-columns-sorting)
+        - [Selecting columns, filtering, sorting](#selecting-columns-filtering-sorting)
         - [Indexing](#indexing)
     - [Exotic functions](#exotic-functions)
         - [Pivot](#pivot)
@@ -171,7 +171,7 @@ Whenever you would like to see a leading or a trailing subset of a table, use th
 $ qcsv '20 sublist .csv.read `data.csv'
 ```
 
-### Filtering, selecting columns, sorting
+### Selecting columns, filtering, sorting
 Once we have a kdb+ table, we can use the full power of qSQL to do any data manipulation. To select columns
 
 ```bash
@@ -189,7 +189,7 @@ $ qcsv '.csv.data[`data.csv; .csv.infoonly[`data.csv; `nsn`item_name]]'
 We can employ complex criteria to select rows.
 
 ```bash
-$ qcsv 'select from .csv.read `data.csv where tem_name like "RIFLE*", fips > 32000'
+$ qcsv 'select from .csv.read `data.csv where item_name like "RIFLE*", fips > 31100'
 ```
 
 We can use q keywords `xasc` and `xdesc` to mock `csvsort`.
