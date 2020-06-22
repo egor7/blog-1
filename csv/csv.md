@@ -1,5 +1,26 @@
 # Powerful CSV processing with kdb+
 
+<!-- TOC -->
+
+- [Powerful CSV processing with kdb+](#powerful-csv-processing-with-kdb)
+    - [Linux command-line tools](#linux-command-line-tools)
+    - [CSVKit](#csvkit)
+    - [xsv](#xsv)
+    - [Type inference](#type-inference)
+    - [kdb+](#kdb)
+        - [Type conversion](#type-conversion)
+    - [kdb+ based one-liners](#kdb-based-one-liners)
+        - [Filtering, selecting columns, sorting](#filtering-selecting-columns-sorting)
+        - [Indexing](#indexing)
+    - [Exotic functions](#exotic-functions)
+        - [Pivot](#pivot)
+        - [Array columns](#array-columns)
+        - [Join](#join)
+    - [Performance](#performance)
+    - [Conclusion](#conclusion)
+
+<!-- /TOC -->
+
 Comma-separated text files (CSV) are the most fundamental format for data processing. All programming languages and software that support working with relational data, also provide some level of CSV handling. You can persist and process data without installing a database management system. It is a lightweight form of storing, processing and sharing data.
 
 The CSV format predates personal computers and has been one of the most common data exchange format for almost 50 years. CSV files will remain with us in the future. Working with this format efficiently is a core requirement of a productive developer, data engineer, DevOps person, etc…
