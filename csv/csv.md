@@ -211,7 +211,7 @@ $ qcsv '-1 .h.cd massage .csv.read `data.csv;' | blackboxcommand
 
 Remember the trailing semi-colon if you want to process the standard input.
 
-Using pipe is the most elegant solution if you would like to run a `csvsql` query on a table that does not fit into the memory, but the query contains a WHERE clause that can be used to reduce the table size. For example, instead of doing
+Using pipe is the most elegant solution if you would like to run a `csvsql` query on a table that does not fit into the memory, and the query contains a WHERE clause that can be used to reduce the table size. For example, instead of doing
 
 ```bash
 $ csvsql --query "select ... FROM data WHERE item_name like "RIFLE*" data.csv
@@ -265,6 +265,8 @@ If we have limited hardware resources and the CSV does not fit into the memory, 
 
 ```bash
 $ q csvguess.q data.csv -savescript -exit
+# overwrite POSTSAVEALL definition in data.load.q to
+# POSTSAVEALL: {@[SAVEPATH[]; `county; `g#]}
 $ q data.load.q -bulksave -savedb kdb -savename t -exit
 ```
 
