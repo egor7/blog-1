@@ -248,7 +248,9 @@ The index feature of xsv speeds up queries by creating a binary file with extens
 $ xsv index data.csv
 ```
 
-Similarly, you can get a huge performance improvement if you convert the CSV to the proprietary kdb+ format and you can get further gain if you add indices to  columns you query often. In the command below, I create the kdb+ equivalent of `data.csv` as table `t` in directory `kdb` and [apply an index](https://code.kx.com/q4m3/8_Tables/#88-attributes) on column `county` via operator ```` `g# ````
+Similarly, you can get a huge performance improvement if you convert the CSV to the proprietary kdb+ format and you can get further gain if you add indices to  columns you query often. You can also sort the table before saving. The [sorted attribute](https://code.kx.com/q4m3/8_Tables/#881-sorted-s) is attached to the column and several operation speeds up by e.g. replacing linear search with binary search.
+
+In the command below, I create the kdb+ equivalent of `data.csv` as table `t` in directory `kdb` and [apply an index](https://code.kx.com/q4m3/8_Tables/#88-attributes) on column `county` via attribute [`g#]()
 
 ```bash
 $ mkdir db
