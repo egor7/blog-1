@@ -26,7 +26,7 @@ Comma-separated text files (CSV) are the most fundamental format for data proces
 
 The CSV format predates personal computers and has been one of the most common data exchange format for almost 50 years. CSV files will remain with us in the future. Working with this format efficiently is a core requirement of a productive developer, data engineer, DevOps person, etc…
 
-In this article, I review available tools to process CSV files and then show how kdb+ and its query language q raise CSV processing to a new level of performance and simplicity.
+This article provides a glimpse into the available tools to process CSV files and then describes how kdb+ and its query language q raise CSV processing to a new level of performance and simplicity.
 
 ## Linux command-line tools
 Linux shells, like Bash, support arrays. You can read a CSV line-by-line and store all fields in an array variable. You can use built-in string manipulation and integer calculations (even float calculations with e.g `bc -l`) to operate on cell values. The code will be lengthy and hard to maintain.
@@ -277,7 +277,7 @@ Note that kdb+ is a columnar database and each column has its own file represent
 ## Exotic functions
 **qSQL is a superset of ANSI SQL**. With our one-liner `qcsv` we can express complex logic that ANSI SQL cannot handle. Furthermore, qSQL is just a part of the q programming language. All the features, libraries and functions of q are available to further massage a CSV file. These include vector operations, functional programming, advanced iterators, date/time and string manipulation, etc.
 
-Furthermore, we can load the business logic that we use in production. **It is like employing the stored procedures of our DBMS to analyze a local CSV. Kdb+ provides a single solution for streaming, in-memory, historic data processing that you can also leverage in your ad hoc data analyses.**
+Kdb+ has more tricks up in its sleeves. We can load the business logic that we use in production. **It is like employing the stored procedures of our DBMS to analyze a local CSV. Kdb+ provides a single solution for streaming, in-memory, historic data processing that you can also leverage in your ad hoc data analyses.**
 
 The possibilities do not end here. Besides loading existing scripts you can also connect to existing kdb+ services easily. For example to evoke q function `fn` on a remote kdb+ server at e.g. `72.7.9.248:5001` with parameter of the content of the CSV, you can use make use of the [one-shot](https://code.kx.com/q/basics/ipc/#sync-request-get) TCP request.
 
@@ -362,7 +362,7 @@ q) l @ 2 1
 6 1
 ```
 
-If we pass a list of lists as both arguments of the `@` operator then we need the Each iterator again. Putting it all together, we add new column `sum_A_of` by
+When passing a list of lists as both arguments of the `@` operator then we need the Each iterator again. Putting it all together, we add new column `sum_A_of` by
 
 
 ```bash
