@@ -26,7 +26,7 @@ Comma-separated text files (CSV) are the most fundamental format for data proces
 
 The CSV format predates personal computers and has been one of the most common data exchange format for almost 50 years. CSV files will remain with us in the future. Working with this format efficiently is a core requirement of a productive developer, data engineer, DevOps person, etc…
 
-This article provides a glimpse into the available tools to process CSV files and then describes how kdb+ and its query language q raise CSV processing to a new level of performance and simplicity.
+This article provides a glimpse into the available tools to process CSV files and describes how kdb+ and its query language q raise CSV processing to a new level of performance and simplicity.
 
 ## Linux command-line tools
 Linux shells, like Bash, support arrays. You can read a CSV line-by-line and store all fields in an array variable. You can use built-in string manipulation and integer calculations (even float calculations with e.g `bc -l`) to operate on cell values. The code will be lengthy and hard to maintain.
