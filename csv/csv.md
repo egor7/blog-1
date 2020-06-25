@@ -248,9 +248,22 @@ The index feature of xsv speeds up queries by creating a binary file with extens
 $ xsv index data.csv
 ```
 
+The recommended way of CSVKit to use indices and speed up SQL queries is to move the content of the CSV into an [SQLite](https://sqlite.org/) database and use its CLI to create an index and query the data. All these assume that you have permission to create files on the computer.
+
+```bash
+$ csvsql --db sqlite:///data.db --insert data.csv
+$ sqlite3 data.db 'CREATE INDEX idx ON data(county)'
+```
+
+To get a nicely formatted output of a query, use command line options `-header` and `-csv`.
+
+```bash
+$ sqlite3 -header -csv data.db 'SELECT county, COUNT(*) AS NR FROM data GROUP BY county;'
+```
+
 Similarly, you can get a huge performance improvement if you convert the CSV to the proprietary kdb+ format and you can get further gain if you add indices to  columns you query often. You can also sort the table before saving. The [sorted attribute](https://code.kx.com/q4m3/8_Tables/#881-sorted-s) is attached to the column and several operations speed up by e.g. replacing linear searches with binary searches.
 
-In the command below, I create the kdb+ equivalent of `data.csv` as table `t` in directory `kdb` and [apply an index](https://code.kx.com/q4m3/8_Tables/#88-attributes) on column `county` via attribute [`g#]()
+In the command below, I create the kdb+ equivalent of `data.csv` as table `t` in directory `db` and [apply an index](https://code.kx.com/q4m3/8_Tables/#88-attributes) on column `county` via attribute [`g#]()
 
 ```bash
 $ mkdir db
@@ -260,7 +273,7 @@ $ qcsv '`:db/t/ set .Q.en[hsym `db] update `g#county from .csv.read `data.csv'
 You don't need the `qcsv` wrapper around the q interpreter to run queries.
 
 ```bash
-$ q db <<< 'select count i by county from t'
+$ q db <<< 'select nr: count i by county from t'
 ```
 
 If we have limited hardware resources and the CSV does not fit into the memory, then we can use `csvguess.q` that supports batch loading and saving.
@@ -272,7 +285,7 @@ $ q csvguess.q data.csv -savescript -exit
 $ q data.load.q -bulksave -savedb kdb -savename t -exit
 ```
 
-Note that kdb+ is a columnar database and each column has its own file representation. When you run query `select count i by county from t` then only column `county` is read and requires resources. This lets you run queries on tables that do not fit into the memory and `csvsql` fails to run.
+Note that kdb+ is a columnar database and each column has its own file representation. When you run query `select count i by county from t` then only column `county` is read and requires resources. This lets you run queries on tables that do not fit into the memory and `csvsql` exits with an error message.
 
 ## Exotic functions
 **qSQL is a superset of ANSI SQL**. With our one-liner `qcsv` we can express complex logic that ANSI SQL cannot handle. Furthermore, qSQL is just a part of the q programming language. All the features, libraries and functions of q are available to further massage a CSV file. These include vector operations, functional programming, advanced iterators, date/time and string manipulation, etc.
