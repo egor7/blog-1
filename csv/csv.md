@@ -287,6 +287,14 @@ $ q data.load.q -bulksave -savedb kdb -savename t -exit
 
 Note that kdb+ is a columnar database and each column has its own file representation. When you run query `select count i by county from t` then only column `county` is read and requires resources. This lets you run queries on tables that do not fit into the memory and `csvsql` exits with an error message.
 
+Comparing SQLite and kdb+ is beyond the scope of this paper, however, a quick comparison on a table with 3.1 million rows suggest that there is a huge difference in performance.
+
+| operation | SQLite | kdb+ |
+| ---: | ---: | ---: |
+| **exec time of importing a CSV** | 223 sec | 6 sec |
+| **memory need of importing a CSV** | 5841 kbyte | 178 kbyte |
+| **exec time of a query** | 6693 msec | 16 msec |
+
 ## Exotic functions
 **qSQL is a superset of ANSI SQL**. With our one-liner `qcsv` we can express complex logic that ANSI SQL cannot handle. Furthermore, qSQL is just a part of the q programming language. All the features, libraries and functions of q are available to further massage a CSV file. These include vector operations, functional programming, advanced iterators, date/time and string manipulation, etc.
 
