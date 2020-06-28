@@ -24,12 +24,12 @@
 
 Comma-separated text files (CSV) are the most fundamental format for data processing. All programming languages and software that support working with relational data, also provide some level of CSV handling. You can persist and process data without installing a database management system. It is a lightweight form of storing, processing and sharing data.
 
-The CSV format predates personal computers and has been one of the most common data exchange format for almost 50 years. CSV files will remain with us in the future. Working with this format efficiently is a core requirement of a productive developer, data engineer, DevOps person, etc…
+The CSV format predates personal computers and has been one of the most common data exchange formats for almost 50 years. CSV files will remain with us in the future. Working with this format efficiently is a core requirement of a productive developer, data engineer, DevOps person, etc…
 
 This article provides a glimpse into the available tools to process CSV files and describes how kdb+ and its query language q raise CSV processing to a new level of performance and simplicity.
 
 ## Linux command-line tools
-Linux shells, like Bash, support arrays. You can read a CSV line-by-line and store all fields in an array variable. You can use built-in string manipulation and integer calculations (even float calculations with e.g `bc -l`) to operate on cell values. The code will be lengthy and hard to maintain.
+Many CSV processing need to be done in a Linux or Mac environment that has a powerful terminal console with some kind of shells on it. Most shells, like Bash, support arrays. You can read a CSV line-by-line and store all fields in an array variable. You can use built-in string manipulation and integer calculations (even float calculations with e.g `bc -l`) to operate on cell values. The code will be lengthy and hard to maintain.
 
 General text processing tools like [`awk`](https://en.wikipedia.org/wiki/AWK) and [`sed`](https://en.wikipedia.org/wiki/Sed) scripts may result in shorter and simpler code. Commands like [`cut`](https://en.wikipedia.org/wiki/Cut_(Unix)), [`sort`](https://en.wikipedia.org/wiki/Sort_(Unix)), [`uniq`](https://en.wikipedia.org/wiki/Uniq) and [`paste`](https://en.wikipedia.org/wiki/Paste_(Unix)) further simplify CSV processing. You can specify the separator and **refer to fields by positions**.
 
@@ -37,19 +37,17 @@ The world is constantly changing. So do CSV files. Position-based reference brea
 
 Position-based reference creates fragile code. Processing CSV by these Linux commands is great for prototyping and for quick analysis but you hit the limits once your codebase starts increasing or you share scripts with other colleagues. No wonder that in SQL the position-based column reference is limited and discouraged.
 
-You can **refer to a column by name**. The column names are stored in the first row of the CSV. Reference by name is sensitive to column renaming but this probably happens less frequently than adding or reshuffling columns.
-
-The huge advantage of Linux command-line tools is that no installation is required. Your shell script will likely run on other's Linux systems. Get familiar with Linux tools but refrain from using them in complex tasks. Remember that the separator is specified by `-t` command-line option for [`sort`](https://en.wikipedia.org/wiki/Sort_(Unix)) and `-d` for the other commands, [`cut`](https://en.wikipedia.org/wiki/Cut_(Unix)), [`paste`](https://en.wikipedia.org/wiki/Paste_(Unix)).
+The huge advantage of Linux command-line tools is that no installation is required. Your shell script will likely run on other's Linux systems Familiarity with tools readily available in Linux is useful, but they should often be avoided for complex, long-lived, tasks.
 
 ## CSVKit
 
-Many open-source libraries on GitHub offer CSV support. Python library [CSVKit](https://csvkit.readthedocs.io/en/latest/#) is one of the most popular. It offers a more robust solution than native Linux commands. Most importantly, CSVKit commands allow reference by column name.
+Many open-source libraries offer CSV support. The Python library [CSVKit](https://csvkit.readthedocs.io/en/latest/#) is one of the most popular. It offers a more robust solution than native Linux commands, such as allowing **reference of columns by name**. The column names are stored in the first row of the CSV. Reference by name is sensitive to column renaming but this probably happens less frequently than adding or moving columns.
 
-Also, they handle the first rows better than the general-purpose text tools do. Linux command `sort` treats the first row as any other row and can place it in the middle of the output. Similarly, `cat` includes the first rows when you concatenate multiple CSV files. Commands `csvsort` and `csvstack` handle first rows as properly.
+Also, CSVKit handles the first rows better than the general-purpose text tools do. Linux command `sort` treats the first row as any other row and can place it in the middle of the output. Similarly, `cat` includes the first rows when you concatenate multiple CSV files. Commands `csvsort` and `csvstack` handle first rows properly.
 
-Finally, the CSVKit developers took special care to provide consistent command-line parameters, e.g. separator is defined by `-d`.
+Finally, the CSVKit developers took special care to provide consistent command-line parameters, e.g. separator is defined by `-d`. In contrast, you need to remember that the separator is specified by `-t` for [`sort`](https://en.wikipedia.org/wiki/Sort_(Unix)) and `-d` for the other Linux commands, [`cut`](https://en.wikipedia.org/wiki/Cut_(Unix)), [`paste`](https://en.wikipedia.org/wiki/Paste_(Unix)).
 
-The naming is coherent, [`csvcut`](https://csvkit.readthedocs.io/en/latest/scripts/csvcut.html), [`csvgrep`](https://csvkit.readthedocs.io/en/latest/scripts/csvgrep.html) and [`csvsort`](https://csvkit.readthedocs.io/en/latest/scripts/csvsort.html) replace traditional Linux commands `cut`, `grep` and `sort`. Nonetheless, the merit of the Linux commands is their speed, probably because they were written in C.
+CSVKit includes the simply-named utilities, [`csvcut`](https://csvkit.readthedocs.io/en/latest/scripts/csvcut.html), [`csvgrep`](https://csvkit.readthedocs.io/en/latest/scripts/csvgrep.html) and [`csvsort`](https://csvkit.readthedocs.io/en/latest/scripts/csvsort.html), which replace the traditional Linux commands `cut`, `grep` and `sort`. Nonetheless, the merit of the Linux commands is their speed.
 
 You probably use Linux commands [`head`](https://en.wikipedia.org/wiki/Head_(Unix)), [`tail`](https://en.wikipedia.org/wiki/Tail_(Unix)), [`less`](https://en.wikipedia.org/wiki/Less_(Unix))/[`more`](https://en.wikipedia.org/wiki/More_(command)) and [`cat`](https://en.wikipedia.org/wiki/Cat_(Unix)) to take a quick look at the content of a text file. Unfortunately, the output of these tools is not appealing for CSV files. The columns are not aligned and you will spend a lot of time squinting a monochrome screen figuring out to which column a given cell belongs. You might give up and import the data into Excel or Google Sheet. However, if the file is on a remote machine you first need to SCP it to your desktop. You can save time and work in the console by using [`csvlook`](https://csvkit.readthedocs.io/en/latest/scripts/csvlook.html). Command `csvlook` nicely aligns column under the column name.
 
@@ -59,7 +57,7 @@ $ csvlook --max-rows 20 data.csv
 
 Don’t worry if your console is narrow: pipe the output to `less -S` and use arrow keys to move left and right.
 
-Another useful extension of CSV tools is command [`csvstat`](https://csvkit.readthedocs.io/en/latest/scripts/csvstat.html). It analyzes the content and displays statistics like the number of distinct values of all columns. Also, it tries to infer types. If the column type is a number then it also returns maximum, minimum, mean, median, and standard deviation of the values.
+Another useful extension included in CSVKit is the command [`csvstat`](https://csvkit.readthedocs.io/en/latest/scripts/csvstat.html). It analyzes the file contents and displays statistics like the number of distinct values of all columns. Also, it tries to infer types. If the column type is a number then it also returns maximum, minimum, mean, median, and standard deviation of the values.
 
 To perform aggregations, filtering and grouping, you can use the generic command [`csvsql`](https://csvkit.readthedocs.io/en/latest/scripts/csvsql.html) that lets you run ANSI SQL commands on CSV files.
 
