@@ -59,43 +59,43 @@ Don’t worry if your console is narrow: pipe the output to `less -S` and use ar
 
 Another useful extension included in CSVKit is the command [`csvstat`](https://csvkit.readthedocs.io/en/latest/scripts/csvstat.html). It analyzes the file contents and displays statistics like the number of distinct values of all columns. Also, it tries to infer types. If the column type is a number then it also returns maximum, minimum, mean, median, and standard deviation of the values.
 
-To perform aggregations, filtering and grouping, you can use the generic command [`csvsql`](https://csvkit.readthedocs.io/en/latest/scripts/csvsql.html) that lets you run ANSI SQL commands on CSV files.
+To perform aggregations, filtering and grouping, you can use the CSVKit command [`csvsql`](https://csvkit.readthedocs.io/en/latest/scripts/csvsql.html) that lets you run ANSI SQL commands on CSV files.
 
 ## xsv
 
 Some CSVKit commands are slow because they load the entire file into the memory and create an in-memory database. Rust developers reimplemented several traditional tools like `cat`, `ls`, `grep` and `find` and tools like [`bat`](https://github.com/sharkdp/bat), [`exa`](https://github.com/ogham/exa), [`ripgrep`](https://github.com/BurntSushi/ripgrep) and [`fd`](https://github.com/sharkdp/fd) were born. No wonder they also created a performant tool for CSV processing, library [`xsv`](https://github.com/BurntSushi/xsv).
 
-The library also supports selecting columns, filtering, sorting and joining CSV. An index can be added to CSV files that are frequently processed to speed up operations. It is an elegant and lightweight step towards DBMS.
+The Rust library also supports selecting columns, filtering, sorting and joining CSV files. An index can be added to CSV files that are frequently processed to speed up operations. It is an elegant and lightweight step towards DBMS.
 
 
 ## Type inference
-CSV is a text file and holds no type information for the columns. A string can be converted to a datatype based on its value. If all values of a column matches the pattern `YYYY.MM.DD` we can conclude that the column holds dates. But how shall we treat the literal 100000? Is it an integer, or a time 10:00:00? Maybe the source process only supports digits and omitted the time separators? In real life, information about the source is not always available and you need to reverse engineer the data. If all values of the column match `HHMMSS` string then we **can** conclude with high confidence that the column holds time values. We can follow two approaches to make a decision.
+CSV is a text format that holds no type information for the columns. A string can be converted to a datatype based on its value. If all values of a column match the pattern `YYYY.MM.DD` we can conclude that the column holds dates. But how shall we treat the literal 100000? Is it an integer, or a time 10:00:00? Maybe the source process only supports digits and omitted the time separators? In real life, information about the source is not always available and you need to reverse engineer the data. If all values of the column match the string `HHMMSS` then we **can** conclude with high confidence that the column holds time values. The following are two approaches we can take to make a decision.
 
-First, we could be strict, i.e. we predefine the pattern that any type needs to match. The patterns do not overlap. If time is defined as `HH:MM:SS` and integers as `[1-9][0-9]*` then 100000 is an integer.
+First, we could be strict: we predefine the pattern that any type needs to match. The patterns do not overlap. If time is defined as `HH:MM:SS` and integers as `[1-9][0-9]*` then 100000 is an integer.
 
 Second, we could let patterns overlap and in case of conflict we choose the type with the smaller domain or based on some rules. This approach prefers time over int for 100000 if the time pattern also contains `HHMMSS`.
 
-Library CSVKit implements the first approach.
+The CSVKit library implements the first approach.
 
 ## kdb+
-Kdb+ natively supports tables that resemble to Pandas/R data frames. Exporting and importing CSV files is part of the core language. Table `t` can be saved in directory `dir` by command
+Kdb+ natively supports table data semantically similar to Pandas/R data frames. Exporting and importing CSV files is part of the core language. Table `t` can be saved in directory `dir` by command
 
 ```
 q) save `:dir/t.csv
 ```
 
-To chose a different name, e.g. `output.csv` then use the File Text operator `0:` for saving text and the utility [`.h.cd`](https://code.kx.com/q/ref/doth/#hcd-csv-from-data) to convert a kdb+ table to a list of strings
+To choose a different name, e.g. `output.csv` then use the File Text operator `0:` for saving text and the utility [`.h.cd`](https://code.kx.com/q/ref/doth/#hcd-csv-from-data) to convert a kdb+ table to a list of strings
 
 ```
 q) `output.csv 0: .h.cd t
 ```
 
-You can also use [other separators](https://code.kx.com/q/ref/file-text/#prepare-text) than comma.
+You can also use [other separators](https://code.kx.com/q/ref/file-text/#prepare-text) than a comma.
 
 To import a CSV `data.csv`, specify the column types and the separator. The following command assumes the column names are in the first row.
 
 ```
-q) ("JFDS* I"; enlist csv) 0:hsym `data.csv
+q) ("JFDS* I"; enlist csv) 0: `data.csv
 ```
 
 The type encoding is available on the [kdb+ reference card](https://code.kx.com/q/ref/#datatypes), `I` stands for integer, `J` for long, `D` for date, etc… Use spaces to ignore columns. Character `*` denotes string.
@@ -113,7 +113,7 @@ q) .csv.read `data.csv
 
 ![displaying CSV content by .csv.read](pic/csvread.png)
 
-Script `csvguess.q` lets you save a metadata about the columns into a text file. Developers can review and adjust the type column and use the metadata in production to load a CSV with correct types. The two scripts have different users. Data scientists prefer `csvutil.q` for ad hoc analyses. When IT staff configure a kdb+ CSV feed then they use the assisted metadata export and import feature of `csvguess.q`. The type hints provide a less error-prone solution than manually entering types for all columns.
+Script `csvguess.q` lets you save a metadata about the columns into a text file. Developers can review and adjust the type column and use the metadata in production to load a CSV with the correct types. The two scripts have different users. Data scientists prefer `csvutil.q` for ad hoc analyses. When IT staff configure a kdb+ CSV feed then they use the assisted metadata export and import feature of `csvguess.q`. The type hints provide a less error-prone solution than manually entering types for all columns.
 
 ### Type conversion
 
@@ -126,13 +126,13 @@ q).csv.read
 {[file] data[file; info[file]]}
 ```
 
-The column meta-data table is a bit similar to `csvstat` output.
+The column metadata table is a bit similar to `csvstat` output.
 
 ![CSV meta-information by csvinfo](pic/csvinfo.png)
 
-Each row belongs to a column and each field stores some useful information about the column, like name (`c`), inferred type (`t`), max width (`mw`), etc… Field `gr` short for *granularity* is particularly interesting as it gives hint how well the column values compresses and if it should be stored as enumeration (symbol in kdb+ parlance) rather than as strings.
+Each row belongs to a column and each field stores some useful information about the column, like name (`c`), inferred type (`t`), max width (`mw`), etc… Field `gr` short for *granularity* is particularly interesting as it indicates how well the column values compress and if they should be stored as an enumeration (symbol in kdb+ parlance) rather than as strings.
 
-You can control the number of lines to be examined for type inference by variable `READLINES`. The default value is 5555. The smaller this number the more chance of an inference rule to be coincidental. For example in sample table (that was also used in CSVKit tutorial) column `fips` matches the patter `HMMSS` for the first 916 rows, so we could infer time as type. The patter matching breaks from line 917 with values like `31067`. To disable partial file-based type inference, just change `READLINES`.
+You can control the number of lines to be examined for type inference by variable `READLINES`. The default value is 5555. The smaller this number the more chance of an inference rule to be coincidental. For example in the sample table (that was also used in the CSVKit tutorial) column `fips` matches the pattern `HMMSS` for the first 916 rows, so we could infer time as type. The pattern matching breaks from line 917 with values like `31067`. To disable partial file-based type inference, just change `READLINES`.
 
 ```
 q) .csv.READLINES: count read0 `data.csv
@@ -140,7 +140,7 @@ q) .csv.READLINES: count read0 `data.csv
 
 ## kdb+ based one-liners
 
-Let us wrap the q interpreter and the load of `csvutil.q` into a simple shell function.
+Let us wrap the q interpreter and the load of `csvutil.q` into a simple shell function to create a powerful command-line CSV processing utility.
 
 ```bash
 $ function qcsv { q -c 25 320 -s $(nproc --all) <<< 'system "l utils/csvutil.q";'"$1"; }
@@ -201,10 +201,10 @@ $ qcsv '`fips xdesc .csv.read `data.csv'
 
 A remarkable feature of the Unix-based system is piping: pass the output from a command as the input to another command. CSVKit also follows this principle. Once the content of a CSV is converted to a kdb+ table, you probably want to stay in this place as the power of q offers a convenient and powerful data-processing environment.
 
-In real life, however, it can happen that you need to execute a black-box script that accepts the input via STDIN. Our `qcsv` command can convert a kdb+ table to produce the required output. For example, in the command below we massage the input CSV via q function `massage` then send the output to command `blackboxcommand`.
+In some cases, however, it can happen that you need to execute a black-box script that accepts the input via STDIN. Our `qcsv` command can convert a kdb+ table to produce the required output. For example, in the command below we massage the input CSV via an anonymous function then send the output to command `blackboxcommand`.
 
 ```bash
-$ qcsv '-1 .h.cd massage .csv.read `data.csv;' | blackboxcommand
+$ qcsv '-1 .h.cd { // do something here } .csv.read `data.csv;' | blackboxcommand
 ```
 
 Remember the trailing semi-colon if you want to process the standard input.
@@ -231,7 +231,7 @@ DATA: (); bulkload[`data.csv; .csv.info[`data.csv]];
 select ... from DATA'
 ```
 
-In the q function, you can do anything: use business or utility functions, do mathematics operations, call out to external server, etc…
+In the q function, you can do anything: use business or utility functions, do mathematics operations, call out to an external server, etc…
 
 Function `POSTLOADALL` is executed after the bulk load is finished. This post processing is particularly useful in the load script generated by `csvguess.q`. For example, several columns (e.g. `root_stone`) in the [NY Street tree data](https://data.cityofnewyork.us/Environment/2015-Street-Tree-Census-Tree-Data/pi5s-9p35) contain `Yes/No` values, that you can easily convert to boolean by
 
@@ -298,7 +298,7 @@ Comparing SQLite and kdb+ is beyond the scope of this paper, however, a quick co
 
 Kdb+ has more tricks up in its sleeves. We can load the business logic that we use in production. **It is like employing the stored procedures of our DBMS to analyze a local CSV. Kdb+ provides a single solution for streaming, in-memory, historic data processing that you can also leverage in your ad hoc data analyses.**
 
-The possibilities do not end here. Besides loading existing scripts you can also connect to existing kdb+ services easily. For example to evoke q function `fn` on a remote kdb+ server at e.g. `72.7.9.248:5001` with parameter of the content of the CSV, you can use make use of the [one-shot](https://code.kx.com/q/basics/ipc/#sync-request-get) TCP request.
+The possibilities do not end here. Besides loading existing scripts you can also connect to existing kdb+ services easily. For example, to evoke q function `fn` on a remote kdb+ server at e.g. `72.7.9.248:5001` with the parameter of the content of the CSV, you can use make use of the [one-shot](https://code.kx.com/q/basics/ipc/#sync-request-get) TCP request.
 
 ```bash
 qcsv '`:72.7.9.248:5001 (`fn; .csv.read `data.csv)'
@@ -316,9 +316,9 @@ I put a wrapper function around when most [wide-spread pivot implementation](htt
 ![pivot](pic/pivot.png)
 
 ### Array columns
-Nothing prevents you putting a list of values into a cell of a CSV. You just need to use a separator other than a comma, e.g. whitespace or semicolon. Unlike ANSI SQL, kdb+ can handle array columns.
+Nothing prevents you from putting a list of values into a cell of a CSV. You just need to use a separator other than a comma, e.g. whitespace or semicolon. Unlike ANSI SQL, kdb+ can handle array columns.
 
-We already used function [.h.cd](https://code.kx.com/q/ref/doth/#hcd-csv-from-data) to convert a kdb+ table to a list of strings before saving that to a CSV. `.h.cd` handles array columns as expected. You can set the secondary delimiter via [.h.d](https://code.kx.com/q/ref/doth/#hd-delimiter). Bear in mind a string in q is a list thus `.h.cd` will insert spaces between the characters. It is simpler to use operator [0:](https://code.kx.com/q/ref/file-text/#prepare-text) if the table contains string columns but not a list of other types.
+We already used function [.h.cd](https://code.kx.com/q/ref/doth/#hcd-csv-from-data) to convert a kdb+ table to a list of strings before saving that to a CSV. `.h.cd` handles array columns as expected. You can set the secondary delimiter via [.h.d](https://code.kx.com/q/ref/doth/#hd-delimiter). Although a string in q is a list of characters, `.h.cd` does not insert secondary delimiters between the characters. This is the behavior most users expect.
 
 When reading the array column of a CSV it will be stored as a string column. Kdb+ function [vs](https://code.kx.com/q/ref/vs/) (that abbreviates **v**ector from **s**tring) splits a string by a separator string.
 
@@ -359,7 +359,7 @@ q) update "I"$" " vs' A from .csv.read `data.csv
 
 Just to illustrate the power of the q language, suppose `data.csv` has another array column called `IDX` containing indices. For each row, we need to calculate the sum of array column `A` restricted to the indices specified by `IDX`. Let me delve inside indexing a little bit.
 
-In q you can index a list the same way as you do in other programing languages.
+In q you can index a list the same way as you do in other programming languages.
 
 ```
 q) l: 4 1 6 3    // this is an integer list
@@ -440,7 +440,7 @@ requestID workerID start end   taskID
 5         sl1     13:10 13:13 ,6h
 ```
 
-Character `h` at the end of the integer list in column `taskID` denotes the _short_ datatype, i.e. an integer is stored in one byte. Function `.csv.info` tries to save memory and use the integer and floating-point representation that requires the least space while preserving all information.
+Character `h` at the end of the integer list in column `taskID` denotes the _short_ datatype, i.e. an integer is stored in two bytes. Function `.csv.info` tries to save memory and use the integer and floating-point representation that requires the least space while preserving all information.
 
 To get the ratio, we need to work with elapsed times.
 
@@ -479,7 +479,7 @@ The `csvsql` is quite similar
 $ csvsql --query "select Region, SUM(Population) AS Population FROM worldcitiespop GROUP BY Region ORDER BY Population DESC LIMIT 10" worldcitiespop.csv
 ```
 
-We can also disable type inference and dialect sniffing by command line options `--no-inference --snifflimit 0`. This speeds up the command execution by a factor of two.
+We can also disable type inference and dialect sniffing by command-line options `--no-inference --snifflimit 0`. This speeds up the command execution by a factor of two.
 
 Several other open-source tools run SQL statements on CSV files. I also evaluated two packages written in Go.
 
@@ -506,4 +506,4 @@ Kdb+ is famous for its stunning speed. Benchmarks tend to focus on data that res
 The test ran on a `n1-standard-4` GCP virtual machine. The run times of the kdb+ solution would further drop with machines of more cores, as kdb+ 4.0 makes use of [multithreaded primitives](https://code.kx.com/q/kb/mt-primitives/).
 
 ## Conclusion
-Many tools out there to process CSV files. Kdb+ has an excellent open-source library `csvutil.q`/`csvguess.q` with a sophisticated type-inference engine. Once you convert CSV into a kdb+ in-memory table, you can easily cope with problems other tools handle only with difficulty - if at all. You can express complex logic in a readable way, that is easy to maintain, simply by wrapping the q interpreter that loads the library into a shell function. The solution is [greener](https://kx.com/blog/kdb-enables-green-computing/) than alternative approaches as it executes faster and requires smaller amount of memory.
+Many tools out there to process CSV files. Kdb+ has an excellent open-source library `csvutil.q`/`csvguess.q` with a sophisticated type-inference engine. Once you convert CSV into a kdb+ in-memory table, you can easily cope with problems other tools handle only with difficulty - if at all. You can express complex logic in a readable way, that is easy to maintain, simply by wrapping the q interpreter that loads the library into a shell function. The solution is [greener](https://kx.com/blog/kdb-enables-green-computing/) than alternative approaches as it executes faster and requires a smaller amount of memory.
