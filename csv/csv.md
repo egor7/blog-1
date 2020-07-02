@@ -23,9 +23,9 @@
 
 <!-- /TOC -->
 
-Comma-separated text files (CSV) are the most fundamental format for data processing. All programming languages and software that support working with relational data, also provide some level of CSV handling. You can persist and process data without installing a database management system. It is a lightweight form of storing, processing and sharing data.
+Comma-separated text files (CSV) are the most fundamental format for data processing. All programming languages and software that support working with relational data, also provide some level of CSV handling. You can persist and process data without installing a database management system. Often you don't need a full-blown DBMS with all its features, like handling transactions and concurrent/remote access, indexing, etc… The lightweight CSV format for storing data allows for easy processing and sharing of the captured information.
 
-The CSV format predates personal computers and has been one of the most common data exchange formats for almost 50 years. CSV files will remain with us in the future. Working with this format efficiently is a core requirement of a productive developer, data engineer, DevOps person, etc…
+The CSV format predates personal computers and has been one of the most common data exchange formats for almost 50 years. CSV files will remain with us in the future. Working with this format efficiently is a core requirement of a productive developer, data engineer, DevOps person, etc… You may need to filter rows, sort by a column, select existing or derive new columns. Perhaps you need to do complex analysis that requires aggregation.
 
 This article provides a glimpse into the available tools to process CSV files and describes how kdb+ and its query language q raise CSV processing to a new level of performance and simplicity.
 
@@ -50,7 +50,7 @@ Finally, the CSVKit developers took special care to provide consistent command-l
 
 CSVKit includes the simply-named utilities, [`csvcut`](https://csvkit.readthedocs.io/en/latest/scripts/csvcut.html), [`csvgrep`](https://csvkit.readthedocs.io/en/latest/scripts/csvgrep.html) and [`csvsort`](https://csvkit.readthedocs.io/en/latest/scripts/csvsort.html), which replace the traditional Linux commands `cut`, `grep` and `sort`. Nonetheless, the merit of the Linux commands is their speed.
 
-You probably use Linux commands [`head`](https://en.wikipedia.org/wiki/Head_(Unix)), [`tail`](https://en.wikipedia.org/wiki/Tail_(Unix)), [`less`](https://en.wikipedia.org/wiki/Less_(Unix))/[`more`](https://en.wikipedia.org/wiki/More_(command)) and [`cat`](https://en.wikipedia.org/wiki/Cat_(Unix)) to take a quick look at the content of a text file. Unfortunately, the output of these tools is not appealing for CSV files. The columns are not aligned and you will spend a lot of time squinting a monochrome screen figuring out to which column a given cell belongs. You might give up and import the data into Excel or Google Sheet. However, if the file is on a remote machine you first need to SCP it to your desktop. You can save time and work in the console by using [`csvlook`](https://csvkit.readthedocs.io/en/latest/scripts/csvlook.html). Command `csvlook` nicely aligns column under the column name.
+You probably use Linux commands [`head`](https://en.wikipedia.org/wiki/Head_(Unix)), [`tail`](https://en.wikipedia.org/wiki/Tail_(Unix)), [`less`](https://en.wikipedia.org/wiki/Less_(Unix))/[`more`](https://en.wikipedia.org/wiki/More_(command)) and [`cat`](https://en.wikipedia.org/wiki/Cat_(Unix)) to take a quick look at the content of a text file. Unfortunately, the output of these tools is not appealing for CSV files. The columns are not aligned and you will spend a lot of time squinting a monochrome screen figuring out to which column a given cell belongs. You might give up and import the data into Excel or Google Sheet. However, if the file is on a remote machine you first need to SCP it to your desktop. You can save time and work in the console by using [`csvlook`](https://csvkit.readthedocs.io/en/latest/scripts/csvlook.html). Command `csvlook` nicely aligns column under the column name. To execute the command below download sample `data.csv` in your working directory as [CSVKit tutorial](https://csvkit.readthedocs.io/en/latest/tutorial/1_getting_started.html#getting-the-data) describes.
 
 ```bash
 $ csvlook --max-rows 20 data.csv
@@ -370,22 +370,22 @@ Just to illustrate the power of the q language, suppose `data.csv` has another a
 In q you can index a list the same way as you do in other programming languages.
 
 ```
-q) l: 4 1 6 3    // this is an integer list
-q) l[2]
+q) list: 4 1 6 3    // this is an integer list
+q) list[2]
 6
 ```
 
 Q is a vector language. Many operators accept not only scalars but lists as well. Indexing is such an operation.
 
 ```
-q) l[2 1]
+q) list[2 1]
 6 1
 ```
 
 The square brackets are just syntactic sugar. You can instead use the `@` operator with infix notation.
 
 ```
-q) l @ 2 1
+q) list @ 2 1
 6 1
 ```
 
