@@ -3,9 +3,10 @@
 <!-- TOC -->
 
 - [Powerful CSV processing with kdb+](#powerful-csv-processing-with-kdb)
-    - [Linux command-line tools](#linux-command-line-tools)
-    - [CSVKit](#csvkit)
-    - [xsv](#xsv)
+    - [Common CSV tools](#common-csv-tools)
+        - [Linux command-line tools](#linux-command-line-tools)
+        - [CSVKit](#csvkit)
+        - [xsv](#xsv)
     - [Type inference](#type-inference)
     - [q/kdb+](#qkdb)
         - [Type conversion](#type-conversion)
@@ -29,7 +30,8 @@ The CSV format predates personal computers and has been one of the most common d
 
 This article provides a glimpse into the available tools to process CSV files and describes how kdb+ and its query language q raise CSV processing to a new level of performance and simplicity.
 
-## Linux command-line tools
+## Common CSV tools
+### Linux command-line tools
 Many CSV processing need to be done in a Linux or Mac environment that has a powerful terminal console with some kind of shells on it. Most shells, like Bash, support arrays. You can read a CSV line-by-line and store all fields in an array variable. You can use built-in string manipulation and integer calculations (even float calculations with e.g `bc -l`) to operate on cell values. The code will be lengthy and hard to maintain.
 
 General text processing tools like [`awk`](https://en.wikipedia.org/wiki/AWK) and [`sed`](https://en.wikipedia.org/wiki/Sed) scripts may result in shorter and simpler code. Commands like [`cut`](https://en.wikipedia.org/wiki/Cut_(Unix)), [`sort`](https://en.wikipedia.org/wiki/Sort_(Unix)), [`uniq`](https://en.wikipedia.org/wiki/Uniq) and [`paste`](https://en.wikipedia.org/wiki/Paste_(Unix)) further simplify CSV processing. You can specify the separator and **refer to fields by positions**.
@@ -40,7 +42,7 @@ Position-based reference creates fragile code. Processing CSV by these Linux com
 
 The huge advantage of Linux command-line tools is that no installation is required. Your shell script will likely run on other's Linux systems Familiarity with tools readily available in Linux is useful, but they should often be avoided for complex, long-lived, tasks.
 
-## CSVKit
+### CSVKit
 
 Many open-source libraries offer CSV support. The Python library [CSVKit](https://csvkit.readthedocs.io/en/latest/#) is one of the most popular. It offers a more robust solution than native Linux commands, such as allowing **reference of columns by name**. The column names are stored in the first row of the CSV. Reference by name is sensitive to column renaming but this probably happens less frequently than adding or moving columns.
 
@@ -50,7 +52,7 @@ Finally, the CSVKit developers took special care to provide consistent command-l
 
 CSVKit includes the simply-named utilities, [`csvcut`](https://csvkit.readthedocs.io/en/latest/scripts/csvcut.html), [`csvgrep`](https://csvkit.readthedocs.io/en/latest/scripts/csvgrep.html) and [`csvsort`](https://csvkit.readthedocs.io/en/latest/scripts/csvsort.html), which replace the traditional Linux commands `cut`, `grep` and `sort`. Nonetheless, the merit of the Linux commands is their speed.
 
-You probably use Linux commands [`head`](https://en.wikipedia.org/wiki/Head_(Unix)), [`tail`](https://en.wikipedia.org/wiki/Tail_(Unix)), [`less`](https://en.wikipedia.org/wiki/Less_(Unix))/[`more`](https://en.wikipedia.org/wiki/More_(command)) and [`cat`](https://en.wikipedia.org/wiki/Cat_(Unix)) to take a quick look at the content of a text file. Unfortunately, the output of these tools is not appealing for CSV files. The columns are not aligned and you will spend a lot of time squinting a monochrome screen figuring out to which column a given cell belongs. You might give up and import the data into Excel or Google Sheet. However, if the file is on a remote machine you first need to SCP it to your desktop. You can save time and work in the console by using [`csvlook`](https://csvkit.readthedocs.io/en/latest/scripts/csvlook.html). Command `csvlook` nicely aligns column under the column name. To execute the command below download sample `data.csv` in your working directory as [CSVKit tutorial](https://csvkit.readthedocs.io/en/latest/tutorial/1_getting_started.html#getting-the-data) describes.
+You probably use Linux commands [`head`](https://en.wikipedia.org/wiki/Head_(Unix)), [`tail`](https://en.wikipedia.org/wiki/Tail_(Unix)), [`less`](https://en.wikipedia.org/wiki/Less_(Unix))/[`more`](https://en.wikipedia.org/wiki/More_(command)) and [`cat`](https://en.wikipedia.org/wiki/Cat_(Unix)) to take a quick look at the content of a text file. Unfortunately, the output of these tools is not appealing for CSV files. The columns are not aligned and you will spend a lot of time squinting a monochrome screen figuring out to which column a given cell belongs. You might give up and import the data into Excel or Google Sheet. However, if the file is on a remote machine you first need to SCP it to your desktop. You can save time and work in the console by using [`csvlook`](https://csvkit.readthedocs.io/en/latest/scripts/csvlook.html). Command `csvlook` nicely aligns column under the column name. To execute the command below, download arms dealership data and convert it to `data.csv` as [CSVKit tutorial](https://csvkit.readthedocs.io/en/latest/tutorial/1_getting_started.html#getting-the-data) describes.
 
 ```bash
 $ csvlook --max-rows 20 data.csv
@@ -62,11 +64,11 @@ Another useful extension included in CSVKit is the command [`csvstat`](https://c
 
 To perform aggregations, filtering and grouping, you can use the CSVKit command [`csvsql`](https://csvkit.readthedocs.io/en/latest/scripts/csvsql.html) that lets you run ANSI SQL commands on CSV files.
 
-## xsv
+### xsv
 
 Some CSVKit commands are slow because they load the entire file into the memory and create an in-memory database. Rust developers reimplemented several traditional tools like `cat`, `ls`, `grep` and `find` and tools like [`bat`](https://github.com/sharkdp/bat), [`exa`](https://github.com/ogham/exa), [`ripgrep`](https://github.com/BurntSushi/ripgrep) and [`fd`](https://github.com/sharkdp/fd) were born. No wonder they also created a performant tool for CSV processing, library [`xsv`](https://github.com/BurntSushi/xsv).
 
-The Rust library also supports selecting columns, filtering, sorting and joining CSV files. An index can be added to CSV files that are frequently processed to speed up operations. It is an elegant and lightweight step towards DBMS.
+The Rust library also supports selecting columns, filtering, sorting and joining CSV files. An index can be added to CSV files that are frequently processed to speed up operations. Indexing is an elegant and lightweight step towards DBMS.
 
 
 ## Type inference
@@ -100,10 +102,10 @@ You can also use [other separators](https://code.kx.com/q/ref/file-text/#prepare
 To import a CSV `data.csv`, specify the column types and the separator. The following command assumes the column names are in the first row.
 
 ```
-q) ("JFDS* I"; enlist csv) 0: `data.csv
+q) ("SSE**F"; enlist csv) 0: `data.csv
 ```
 
-The type encoding is available on the [kdb+ reference card](https://code.kx.com/q/ref/#datatypes), `I` stands for integer, `J` for long, `D` for date, etc… Use spaces to ignore columns. Character `*` denotes string.
+The type encoding is available on the [kdb+ reference card](https://code.kx.com/q/ref/#datatypes), `E` stands for real, `I` for integer, `S` for enumeration (symbol in kdb+ parlance), `D` for date, etc… Use spaces to ignore columns. Character `*` denotes string.
 
 Specifying types manually has high maintenance costs, is laborious for wide CSV files and is prone to error. Inserting a single new column can break the code.
 
@@ -122,7 +124,7 @@ Script `csvguess.q` lets you save a metadata about the columns into a text file.
 
 ### Type conversion
 
-Library `csvutil.q` supports both type conversions. The strict mode is implemented by `.csv.basicread`. Function `.csv.read` checks more patterns to infer types.
+Library `csvutil.q` supports both type conversions - the strict mode is implemented by `.csv.basicread`, while the `.csv.read` function checks more patterns to infer types.
 
 Function `.csv.read` is just a wrapper around the general function `.csv.data` that accepts a filename and a meta-data table. The meta-data can be generated by `.csv.basicinfo` and `.csv.info` depending on the inference rule set we would like to employ. You can see the function definition in the q interpreter by typing the function name the press Enter.
 
@@ -135,7 +137,7 @@ The column metadata table is a bit similar to `csvstat` output.
 
 ![CSV meta-information by csvinfo](pic/csvinfo.png)
 
-Each row belongs to a column and each field stores some useful information about the column, like name (`c`), inferred type (`t`), max width (`mw`), etc… Field `gr` short for *granularity* is particularly interesting as it indicates how well the column values compress and if they should be stored as an enumeration (symbol in kdb+ parlance) rather than as strings.
+Each row belongs to a column and each field stores some useful information about the column, like name (`c`), inferred type (`t`), max width (`mw`), etc… Field `gr` short for *granularity* is particularly interesting as it indicates how well the column values compress and if they should be stored as an enumeration rather than as strings. For more details about the columns, please see the [documentation](https://github.com/KxSystems/kdb/blob/master/utils/csv.md).
 
 You can control the number of lines to be examined for type inference by variable `READLINES`. The default value is 5555. The smaller this number the more chance of an inference rule to be coincidental. For example in the sample table (that was also used in the CSVKit tutorial) column `fips` matches the pattern `HMMSS` for the first 916 rows, so we could infer time as type. The pattern matching breaks from line 917 with values like `31067`. To disable partial file-based type inference, just change `READLINES`.
 
@@ -190,7 +192,7 @@ In kdb+, function `.csv.infoonly` accepts a list of columns to restrict the colu
 $ qcsv '.csv.data[`data.csv; .csv.infoonly[`data.csv; `nsn`item_name]]'
 ```
 
-We can employ complex criteria to select rows.
+Using qSQL again, we can further filter our results to select matching rows.
 
 ```bash
 $ qcsv 'select from .csv.read `data.csv where item_name like "RIFLE*", fips > 31100'
