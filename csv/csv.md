@@ -238,7 +238,7 @@ q) \l utils/csvutil.q
 q) POSTLOADEACH: {x where x[`item_name] like "RIFLE*"};
 q) DATA: ();
 q) bulkload[`data.csv; .csv.info[`data.csv]];
-q) select ... from DATA'
+q) select ... from DATA
 ```
 
 In the q functions, you can do anything: use business or utility functions, do mathematics operations, call out to an external server, etc…
