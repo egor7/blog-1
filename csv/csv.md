@@ -513,7 +513,7 @@ The following table contains the memory needs in kbytes
 
 Kdb+ is famous for its stunning speed. Benchmarks tend to focus on data that resides either in-memory or on disk using its proprietary format. CSV support is a useful feature of the language. However, the extreme optimization, the support of vector operations and the inherent parallelization pays off: kdb+ significantly outperforms tools purpose-built for CSV analysis. The execution speed translates directly to productivity. How much does it cost you if the query returns in almost two minutes instead of 2 seconds? What do developers do if repeatedly interrupted by minutes-long wait phases?
 
-The support is also a key factor when selecting a tool. Pet projects and solutions that do not generate direct or indirect income to the developers can easily be abandoned. The vendor of q/kdb+, [Kx Systems](https://kx.com/), was founded in 1993 and provides a stable background and professional support channels, and [high quality documentation](https://code.kx.com/q/) for kdb+ developers.
+The support is also a key factor when selecting a tool. Pet projects and other non-profit solutions with increasing maintenance costs can easily be abandoned. The vendor of q/kdb+, [Kx Systems](https://kx.com/), was founded in 1993 and provides a stable background and professional support channels, and [high quality documentation](https://code.kx.com/q/) for kdb+ developers.
 
 The test ran on a `n1-standard-4` GCP virtual machine. The run times of the kdb+ solution would further drop with machines of more cores, as kdb+ 4.0 makes use of [multithreaded primitives](https://code.kx.com/q/kb/mt-primitives/).
 
