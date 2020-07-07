@@ -81,7 +81,7 @@ Second, we could let patterns overlap and in case of conflict we choose the type
 The CSVKit library implements the first approach.
 
 ## q/kdb+
-[Q](https://code.kx.com/q4m3/) is a general-purpose programming language. Tables are first-class objects in q. Q tables are semantically similar to Pandas/R data frames. You can persist tables to disk, hence the solution can be considered a database, referred to as [kdb+](https://code.kx.com/q4m3/14_Introduction_to_Kdb+/).
+Kdb+ is the [world's fastest time-series database](https://kx.com/media/2018/10/Kx-FAQ.pdf), optimized for ingesting, analyzing and storing massive amounts of structured data. Its query language, called [Q](https://code.kx.com/q4m3/), is a general-purpose programming language. Tables are first-class objects in q. Q tables are semantically similar to Pandas/R data frames. You can persist tables to disk, hence the solution can be considered a database, referred to as [kdb+](https://code.kx.com/q4m3/14_Introduction_to_Kdb+/).
 
 Exporting and importing CSV files is part of the core language. Table `t` can be saved in directory `dir` by command
 
@@ -518,7 +518,7 @@ The support is also a key factor when selecting a tool. Pet projects and other n
 The test ran on a `n1-standard-4` GCP virtual machine. The run times of the kdb+ solution would further drop with machines of more cores, as kdb+ 4.0 makes use of [multithreaded primitives](https://code.kx.com/q/kb/mt-primitives/).
 
 ## Conclusion
-Many tools out there to process CSV files. Kdb+ has an excellent open-source library `csvutil.q`/`csvguess.q` with a sophisticated type-inference engine. Once you convert CSV into a kdb+ in-memory table, you can easily cope with problems other tools handle only with difficulty - if at all. You can express complex logic in a readable way, that is easy to maintain, simply by wrapping the q interpreter that loads the library into a shell function. The solution is [greener](https://kx.com/blog/kdb-enables-green-computing/) than alternative approaches as it executes faster and requires a smaller amount of memory.
+There are myriads of libraries out there to process CSV files, and many have its reasons to exist. Kdb+ has an excellent open-source library `csvutil.q`/`csvguess.q` with a sophisticated type-inference engine. Once you convert CSV into a kdb+ in-memory table, you can easily cope with problems other tools handle only with difficulty - if at all. You can express complex logic in a readable way, that is easy to maintain, simply by wrapping the q interpreter that loads the library into a shell function. The solution is [greener](https://kx.com/blog/kdb-enables-green-computing/) than alternative approaches as it executes faster and requires a smaller amount of memory.
 
 #### Acknowledgement
 I would like to express my gratitude to [Stephen Taylor](https://www.linkedin.com/in/stephen-taylor-b5ba78/), [Tim Thornton](https://www.linkedin.com/in/tthornton6/), [Rebecca Kelly](https://www.linkedin.com/in/kellyr13/) and [Rian O'Cuinneagain](https://github.com/rianoc) who provided valuable feedback and improved the content considerably.
