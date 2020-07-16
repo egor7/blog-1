@@ -28,7 +28,7 @@
 
 Comma-separated text files (CSV) are the most fundamental format for data processing. All programming languages and software that support working with relational data, also provide some level of CSV handling. You can persist and process data without installing a database management system. Often you don't need a full-blown DBMS with all its features, like handling transactions and concurrent/remote access, indexing, etc… The lightweight CSV format allows for easy processing and sharing of the captured information.
 
-The CSV format predates personal computers and has been one of the most common data exchange formats for almost 50 years. CSV files will remain with us in the future. Working with this format efficiently is a core requirement of a productive developer, data engineer/scientists, DevOps person, etc… You may need to filter rows, sort by a column, select existing or derive new columns. Perhaps you need to do complex analysis that requires aggregation and grouping.
+The CSV format predates personal computers and has been one of the most common data exchange formats for almost 50 years. CSV files will remain with us in the future. Working with this format efficiently is a core requirement of a productive developer, data engineer/scientist, DevOps person, etc… You may need to filter rows, sort by a column, select existing or derive new columns. Perhaps you need to do complex analysis that requires aggregation and grouping.
 
 This article provides a glimpse into the available tools to work with CSV files and describes how kdb+ and its query language q raise CSV processing to a new level of performance and simplicity.
 
@@ -42,7 +42,7 @@ The world is constantly changing. So do CSV files. Position-based reference brea
 
 Position-based reference creates fragile code. Processing CSV by these Linux commands is great for prototyping and for quick analysis but you hit the limits once your codebase starts increasing or you share scripts with other colleagues. No wonder that in SQL the position-based column reference is limited and discouraged.
 
-The huge advantage of Linux command-line tools is that no installation is required. Your shell script will likely run on other's Linux systems Familiarity with tools readily available in Linux is useful, but they should often be avoided for complex, long-lived, tasks.
+The huge advantage of Linux command-line tools is that no installation is required. Your shell script will likely run on other's Linux systems. Familiarity with tools readily available in Linux is useful, but they should often be avoided for complex, long-lived, tasks.
 
 ### CSVKit
 
