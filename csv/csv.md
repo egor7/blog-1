@@ -1,3 +1,5 @@
+![CSV and q/kdb+](pic/csvCoverPhoto.jpg)
+
 # Powerful CSV processing with kdb+
 
 <!-- TOC -->
