@@ -1,4 +1,4 @@
-![CSV and q/kdb+](pic/csvCoverPhoto.jpg)
+![CSV and q/kdb+](pic/csvCoverPhotoChopped.png)
 
 # Powerful CSV processing with kdb+
 
