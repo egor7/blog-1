@@ -327,6 +327,12 @@ I put a [wrapper function](https://github.com/BodonFerenc/kdbutils/blob/master/d
 
 ![pivot](pic/pivot.png)
 
+The q language lets you easily extend pivot tables by total columns and total rows provided you are ready to leave the convenient world of select statements and use functional forms. Exploring the functional equivalent of any select statement is beyond the scope of this paper. Here, I only show the solution to demonstrate feasibility.
+
+![pivot](pic/pivotWithTotal.png)
+
+Note, that the median of the totals cannot be directly derived from the raw pivot table. Three additional select statements are executed under the hood.
+
 ### Array columns
 Nothing prevents you from putting a list of values into a cell of a CSV. You just need to use a separator other than a comma, e.g. whitespace or semicolon. Unlike ANSI SQL, kdb+ can handle array columns.
 
